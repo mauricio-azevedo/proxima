@@ -1,0 +1,46 @@
+<main class="auth-page">
+  <section class="auth-card">
+    <div class="auth-header">
+      <p class="eyebrow">Próxima</p>
+      <h1>Entrar</h1>
+      <p>Entre para gerenciar seus grupos e peladas.</p>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <label>
+        Email
+        <input
+          name="email"
+          type="email"
+          autocomplete="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </label>
+
+      <label>
+        Senha
+        <input
+          name="password"
+          type="password"
+          autocomplete="current-password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+      </label>
+
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Entrando...' : 'Entrar' }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Ainda não tem conta?
+      <a routerLink="/register">Cadastre-se</a>
+    </p>
+  </section>
+</main>
