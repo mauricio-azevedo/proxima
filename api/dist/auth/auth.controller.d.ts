@@ -1,7 +1,7 @@
 import { AuthService } from './auth.service';
-import { AuthenticatedRequest } from './authenticated-request';
-import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
+import type { AuthenticatedRequest } from './authenticated-request';
+import type { LoginDto } from './dto/login.dto';
+import type { RegisterDto } from './dto/register.dto';
 export declare class AuthController {
     private readonly authService;
     constructor(authService: AuthService);
