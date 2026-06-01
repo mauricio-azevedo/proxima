@@ -1,0 +1,81 @@
+<main class="auth-page">
+  <section class="auth-card">
+    <div class="auth-header">
+      <p class="eyebrow">Próxima</p>
+      <h1>Criar conta</h1>
+      <p>Cadastre-se para criar grupos e organizar suas peladas.</p>
+    </div>
+
+    <form class="auth-form" (ngSubmit)="submit()">
+      <div class="form-grid">
+        <label>
+          Nome
+          <input
+            name="firstName"
+            type="text"
+            autocomplete="given-name"
+            [ngModel]="firstName()"
+            (ngModelChange)="firstName.set($event)"
+          />
+        </label>
+
+        <label>
+          Sobrenome
+          <input
+            name="lastName"
+            type="text"
+            autocomplete="family-name"
+            [ngModel]="lastName()"
+            (ngModelChange)="lastName.set($event)"
+          />
+        </label>
+      </div>
+
+      <label>
+        Apelido
+        <input
+          name="nickname"
+          type="text"
+          autocomplete="nickname"
+          [ngModel]="nickname()"
+          (ngModelChange)="nickname.set($event)"
+        />
+      </label>
+
+      <label>
+        Email
+        <input
+          name="email"
+          type="email"
+          autocomplete="email"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </label>
+
+      <label>
+        Senha
+        <input
+          name="password"
+          type="password"
+          autocomplete="new-password"
+          [ngModel]="password()"
+          (ngModelChange)="password.set($event)"
+        />
+      </label>
+
+      @if (errorMessage()) {
+        <p class="error-message">{{ errorMessage() }}</p>
+      }
+
+      <button type="submit" [disabled]="isSubmitting()">
+        {{ isSubmitting() ? 'Criando...' : 'Criar conta' }}
+      </button>
+    </form>
+
+    <p class="auth-footer">
+      Já tem conta?
+      <a routerLink="/login">Entrar</a>
+    </p>
+  </section>
+</main>
