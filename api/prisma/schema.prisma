@@ -113,10 +113,10 @@ model Pelada {
 }
 
 model PeladaPlayer {
-  id            String              @id @default(uuid())
-  peladaId      String              @map("pelada_id")
-  groupMemberId String              @map("group_member_id")
-  status        PeladaPlayerStatus  @default(ACTIVE)
+  id            String             @id @default(uuid())
+  peladaId      String             @map("pelada_id")
+  groupMemberId String             @map("group_member_id")
+  status        PeladaPlayerStatus @default(ACTIVE)
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -136,7 +136,7 @@ model PeladaPlayer {
 model PeladaQueueEntry {
   id             String @id @default(uuid())
   peladaId        String @map("pelada_id")
-  peladaPlayerId  String @map("pelada_player_id")
+  peladaPlayerId  String @unique @map("pelada_player_id")
   position        Int
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -145,7 +145,6 @@ model PeladaQueueEntry {
   pelada       Pelada       @relation(fields: [peladaId], references: [id], onDelete: Cascade)
   peladaPlayer PeladaPlayer @relation(fields: [peladaPlayerId], references: [id], onDelete: Cascade)
 
-  @@unique([peladaId, peladaPlayerId])
   @@unique([peladaId, position])
   @@index([peladaId])
   @@map("pelada_queue_entries")
