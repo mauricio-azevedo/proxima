@@ -1,0 +1,191 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  REGISTERED
+  PLACEHOLDER
+}
+
+enum GroupMemberRole {
+  ADMIN
+  MEMBER
+}
+
+enum PeladaStatus {
+  OPEN
+  FINISHED
+}
+
+enum PeladaPlayerStatus {
+  ACTIVE
+  ABSENT
+}
+
+enum MatchStatus {
+  IN_PROGRESS
+  FINISHED
+}
+
+enum MatchTeam {
+  A
+  B
+}
+
+model User {
+  id           String     @id @default(uuid())
+  firstName    String?    @map("first_name")
+  lastName     String?    @map("last_name")
+  nickname     String
+  email        String?    @unique
+  passwordHash String?    @map("password_hash")
+  status       UserStatus @default(PLACEHOLDER)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  ownedGroups Group[]       @relation("GroupOwner")
+  memberships GroupMember[]
+
+  @@map("users")
+}
+
+model Group {
+  id      String @id @default(uuid())
+  name    String
+  ownerId String @map("owner_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  owner   User          @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Restrict)
+  members GroupMember[]
+  peladas Pelada[]
+
+  @@index([ownerId])
+  @@map("groups")
+}
+
+model GroupMember {
+  id      String          @id @default(uuid())
+  groupId String          @map("group_id")
+  userId  String          @map("user_id")
+  role    GroupMemberRole @default(MEMBER)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+
+  peladaPlayers PeladaPlayer[]
+
+  @@unique([groupId, userId])
+  @@index([userId])
+  @@map("group_members")
+}
+
+model Pelada {
+  id             String       @id @default(uuid())
+  groupId         String       @map("group_id")
+  name            String
+  date            DateTime?
+  playersPerTeam  Int          @default(5) @map("players_per_team")
+  status          PeladaStatus @default(OPEN)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  group        Group               @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  players      PeladaPlayer[]
+  queueEntries PeladaQueueEntry[]
+  matches      Match[]
+
+  @@index([groupId])
+  @@index([status])
+  @@index([date])
+  @@map("peladas")
+}
+
+model PeladaPlayer {
+  id            String              @id @default(uuid())
+  peladaId      String              @map("pelada_id")
+  groupMemberId String              @map("group_member_id")
+  status        PeladaPlayerStatus  @default(ACTIVE)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  pelada      Pelada      @relation(fields: [peladaId], references: [id], onDelete: Cascade)
+  groupMember GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Restrict)
+
+  queueEntry   PeladaQueueEntry?
+  matchPlayers MatchPlayer[]
+
+  @@unique([peladaId, groupMemberId])
+  @@index([groupMemberId])
+  @@index([peladaId, status])
+  @@map("pelada_players")
+}
+
+model PeladaQueueEntry {
+  id             String @id @default(uuid())
+  peladaId        String @map("pelada_id")
+  peladaPlayerId  String @map("pelada_player_id")
+  position        Int
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  pelada       Pelada       @relation(fields: [peladaId], references: [id], onDelete: Cascade)
+  peladaPlayer PeladaPlayer @relation(fields: [peladaPlayerId], references: [id], onDelete: Cascade)
+
+  @@unique([peladaId, peladaPlayerId])
+  @@unique([peladaId, position])
+  @@index([peladaId])
+  @@map("pelada_queue_entries")
+}
+
+model Match {
+  id       String      @id @default(uuid())
+  peladaId String      @map("pelada_id")
+  sequence Int
+  status   MatchStatus @default(IN_PROGRESS)
+
+  startedAt  DateTime  @default(now()) @map("started_at")
+  finishedAt DateTime? @map("finished_at")
+  teamAScore Int?      @map("team_a_score")
+  teamBScore Int?      @map("team_b_score")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  pelada  Pelada        @relation(fields: [peladaId], references: [id], onDelete: Cascade)
+  players MatchPlayer[]
+
+  @@unique([peladaId, sequence])
+  @@index([peladaId, status])
+  @@map("matches")
+}
+
+model MatchPlayer {
+  id             String    @id @default(uuid())
+  matchId         String    @map("match_id")
+  peladaPlayerId  String    @map("pelada_player_id")
+  team            MatchTeam
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  match        Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  peladaPlayer PeladaPlayer @relation(fields: [peladaPlayerId], references: [id], onDelete: Restrict)
+
+  @@unique([matchId, peladaPlayerId])
+  @@index([matchId, team])
+  @@index([peladaPlayerId])
+  @@map("match_players")
+}
