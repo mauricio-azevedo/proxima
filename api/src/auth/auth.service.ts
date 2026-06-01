@@ -140,6 +140,6 @@ export class AuthService {
       status: true,
       createdAt: true,
       updatedAt: true,
-    };
+    } as const;
   }
 }
