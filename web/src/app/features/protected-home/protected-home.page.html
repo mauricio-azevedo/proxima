@@ -1,11 +1,101 @@
-<main class="home-page">
-  <section class="home-card">
+<main class="groups-page">
+  <header class="groups-header">
     <div>
-      <p class="eyebrow">Área protegida</p>
-      <h1>Bem-vindo, {{ user()?.nickname }}</h1>
-      <p>O login funcionou. A próxima etapa é listar e criar grupos aqui.</p>
+      <p class="eyebrow">Próxima</p>
+      <h1>Meus grupos</h1>
+      <p>Olá, {{ user()?.nickname }}. Crie ou acesse um grupo para organizar as próximas peladas.</p>
     </div>
 
-    <button type="button" (click)="logout()">Sair</button>
+    <button class="secondary-button" type="button" (click)="logout()">Sair</button>
+  </header>
+
+  <section class="groups-layout">
+    <section class="panel create-panel" aria-labelledby="create-group-title">
+      <div class="panel-header">
+        <h2 id="create-group-title">Criar grupo</h2>
+        <p>Comece criando o grupo da sua turma. Depois você adiciona os jogadores.</p>
+      </div>
+
+      <form class="create-form" [formGroup]="form" (ngSubmit)="createGroup()" novalidate>
+        @if (createErrorMessage()) {
+          <p class="alert-message" role="alert">{{ createErrorMessage() }}</p>
+        }
+
+        <div class="form-field">
+          <label for="groupName">Nome do grupo</label>
+          <input
+            id="groupName"
+            class="text-input"
+            type="text"
+            formControlName="name"
+            autocomplete="off"
+            placeholder="Ex: Futebol de quinta"
+            [attr.aria-invalid]="shouldShowError(name) ? 'true' : 'false'"
+            [attr.aria-describedby]="shouldShowError(name) ? 'group-name-error' : 'group-name-hint'"
+          />
+
+          @if (shouldShowError(name)) {
+            <p id="group-name-error" class="field-error">
+              @if (name.hasError('required')) {
+                Informe o nome do grupo.
+              } @else if (name.hasError('minlength')) {
+                Use pelo menos 2 caracteres.
+              } @else {
+                Use no máximo 80 caracteres.
+              }
+            </p>
+          } @else {
+            <p id="group-name-hint" class="field-hint">Você poderá editar esse nome depois.</p>
+          }
+        </div>
+
+        <button class="primary-button" type="submit" [disabled]="isCreating()">
+          {{ isCreating() ? 'Criando...' : 'Criar grupo' }}
+        </button>
+      </form>
+    </section>
+
+    <section class="panel list-panel" aria-labelledby="groups-list-title">
+      <div class="panel-header list-header">
+        <div>
+          <h2 id="groups-list-title">Grupos</h2>
+          <p>Escolha um grupo para continuar.</p>
+        </div>
+
+        <button class="ghost-button" type="button" (click)="loadGroups()" [disabled]="isLoading()">
+          Atualizar
+        </button>
+      </div>
+
+      @if (isLoading()) {
+        <div class="state-card">Carregando seus grupos...</div>
+      } @else if (loadErrorMessage()) {
+        <div class="state-card error-state">
+          <p>{{ loadErrorMessage() }}</p>
+          <button class="secondary-button" type="button" (click)="loadGroups()">Tentar novamente</button>
+        </div>
+      } @else if (!hasGroups()) {
+        <div class="state-card empty-state">
+          <strong>Nenhum grupo ainda</strong>
+          <span>Crie seu primeiro grupo para começar a organizar a fila da pelada.</span>
+        </div>
+      } @else {
+        <div class="groups-list">
+          @for (group of groups(); track group.id) {
+            <article class="group-card">
+              <div>
+                <h3>{{ group.name }}</h3>
+                <p>
+                  {{ group._count.members }} membro{{ group._count.members === 1 ? '' : 's' }} ·
+                  {{ group._count.peladas }} pelada{{ group._count.peladas === 1 ? '' : 's' }}
+                </p>
+              </div>
+
+              <span class="role-pill">{{ group.members[0]?.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
+            </article>
+          }
+        </div>
+      }
+    </section>
   </section>
 </main>
