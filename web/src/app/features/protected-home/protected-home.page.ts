@@ -41,6 +41,7 @@ export class ProtectedHomePage implements OnInit {
   readonly groups = signal<GroupView[]>([]);
   readonly isLoading = signal(true);
   readonly isCreating = signal(false);
+  readonly isCreateDialogOpen = signal(false);
   readonly wasSubmitted = signal(false);
   readonly loadErrorMessage = signal('');
   readonly createErrorMessage = signal('');
@@ -78,6 +79,20 @@ export class ProtectedHomePage implements OnInit {
     });
   }
 
+  openCreateDialog(): void {
+    this.resetCreateForm();
+    this.isCreateDialogOpen.set(true);
+  }
+
+  closeCreateDialog(): void {
+    if (this.isCreating()) {
+      return;
+    }
+
+    this.isCreateDialogOpen.set(false);
+    this.resetCreateForm();
+  }
+
   createGroup(): void {
     this.wasSubmitted.set(true);
     this.createErrorMessage.set('');
@@ -93,10 +108,10 @@ export class ProtectedHomePage implements OnInit {
 
     this.groupsService.create({ name }).subscribe({
       next: (group) => {
-        this.groups.update((groups) => [group, ...groups]);
-        this.form.reset({ name: '' });
-        this.wasSubmitted.set(false);
+        this.groups.update((groups) => [group, ...groups.filter((current) => current.id !== group.id)]);
         this.isCreating.set(false);
+        this.isCreateDialogOpen.set(false);
+        this.resetCreateForm();
       },
       error: () => {
         this.isCreating.set(false);
@@ -111,5 +126,11 @@ export class ProtectedHomePage implements OnInit {
 
   shouldShowError(control: AbstractControl): boolean {
     return control.invalid && (control.touched || this.wasSubmitted());
+  }
+
+  private resetCreateForm(): void {
+    this.form.reset({ name: '' });
+    this.wasSubmitted.set(false);
+    this.createErrorMessage.set('');
   }
 }
