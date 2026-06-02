@@ -1,21 +1,15 @@
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { AuthService } from '../../core/auth/auth.service';
 import type { GroupView } from '../../core/groups/groups.models';
 import { GroupsService } from '../../core/groups/groups.service';
+import { AppShellComponent } from '../../shared/app-shell/app-shell.component';
 import { CreateGroupDialogComponent } from './components/create-group-dialog/create-group-dialog.component';
-import { GroupsAppHeaderComponent } from './components/groups-app-header/groups-app-header.component';
-import { GroupsHeroComponent } from './components/groups-hero/groups-hero.component';
 import { GroupsListComponent } from './components/groups-list/groups-list.component';
 
 @Component({
   selector: 'app-protected-home-page',
-  imports: [
-    CreateGroupDialogComponent,
-    GroupsAppHeaderComponent,
-    GroupsHeroComponent,
-    GroupsListComponent,
-  ],
+  imports: [AppShellComponent, CreateGroupDialogComponent, GroupsListComponent],
   templateUrl: './protected-home.page.html',
   styleUrl: './protected-home.page.scss',
 })
@@ -23,14 +17,12 @@ export class ProtectedHomePage implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly groupsService = inject(GroupsService);
 
-  readonly user = this.authService.currentUser;
   readonly groups = signal<GroupView[]>([]);
   readonly isLoading = signal(true);
   readonly isCreating = signal(false);
   readonly isCreateDialogOpen = signal(false);
   readonly loadErrorMessage = signal('');
   readonly createErrorMessage = signal('');
-  readonly hasGroups = computed(() => this.groups().length > 0);
 
   ngOnInit(): void {
     this.loadGroups();
