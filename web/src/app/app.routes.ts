@@ -11,9 +11,7 @@ export const routes: Routes = [
   {
     path: 'register',
     loadComponent: () =>
-      import('./features/auth/register/register.page').then(
-        (module) => module.RegisterPage,
-      ),
+      import('./features/auth/register/register.page').then((module) => module.RegisterPage),
   },
   {
     path: 'app',

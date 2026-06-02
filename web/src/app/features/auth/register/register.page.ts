@@ -102,7 +102,9 @@ export class RegisterPage implements OnInit {
         },
         error: () => {
           this.isSubmitting.set(false);
-          this.errorMessage.set('Não foi possível criar sua conta. Confira os dados e tente novamente.');
+          this.errorMessage.set(
+            'Não foi possível criar sua conta. Confira os dados e tente novamente.',
+          );
         },
       });
   }

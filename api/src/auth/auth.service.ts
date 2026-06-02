@@ -32,7 +32,9 @@ export class AuthService {
     }
 
     if (password.length < 6) {
-      throw new BadRequestException('Password must have at least 6 characters.');
+      throw new BadRequestException(
+        'Password must have at least 6 characters.',
+      );
     }
 
     const existingUser = await this.prisma.user.findUnique({

@@ -125,7 +125,9 @@
             autocomplete="new-password"
             formControlName="password"
             [attr.aria-invalid]="shouldShowError(password) ? 'true' : 'false'"
-            [attr.aria-describedby]="shouldShowError(password) ? 'password-error password-hint' : 'password-hint'"
+            [attr.aria-describedby]="
+              shouldShowError(password) ? 'password-error password-hint' : 'password-hint'
+            "
           />
 
           @if (shouldShowError(password)) {
