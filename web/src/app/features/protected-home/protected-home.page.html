@@ -1,0 +1,11 @@
+<main class="home-page">
+  <section class="home-card">
+    <div>
+      <p class="eyebrow">Área protegida</p>
+      <h1>Bem-vindo, {{ user()?.nickname }}</h1>
+      <p>O login funcionou. A próxima etapa é listar e criar grupos aqui.</p>
+    </div>
+
+    <button type="button" (click)="logout()">Sair</button>
+  </section>
+</main>
