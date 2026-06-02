@@ -22,6 +22,12 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'groups/:groupId',
+    canActivate: [routeAuthGuard],
+    loadComponent: () =>
+      import('./features/group-detail/group-detail.page').then((module) => module.GroupDetailPage),
+  },
+  {
     path: '',
     pathMatch: 'full',
     redirectTo: 'app',
