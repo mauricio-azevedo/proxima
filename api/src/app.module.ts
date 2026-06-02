@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { validateEnvironment } from './config/env.validation';
+import { GroupsModule } from './groups/groups.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { validateEnvironment } from './config/env.validation';
       validate: validateEnvironment,
     }),
     AuthModule,
+    GroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
