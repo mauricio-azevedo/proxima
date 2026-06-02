@@ -1,0 +1,142 @@
+.groups-content {
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: 1.5rem;
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: 0 1.5rem 5rem rgba(0, 0, 0, 0.22);
+  padding: clamp(1rem, 3vw, 1.4rem);
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1rem;
+}
+
+h2,
+p {
+  margin: 0;
+}
+
+h2 {
+  font-size: 1.25rem;
+  letter-spacing: -0.035em;
+}
+
+.section-header p,
+.state-card p,
+.empty-state p {
+  color: #94a3b8;
+  line-height: 1.6;
+}
+
+.groups-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+  gap: 0.9rem;
+}
+
+.ghost-button,
+.secondary-button,
+.primary-button {
+  min-height: 2.6rem;
+  border-radius: 0.85rem;
+  padding: 0 1rem;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.primary-button {
+  border: 0;
+  background: #22c55e;
+  color: #052e16;
+}
+
+.secondary-button,
+.ghost-button {
+  border: 1px solid rgba(148, 163, 184, 0.26);
+  background: rgba(15, 23, 42, 0.78);
+  color: #f8fafc;
+}
+
+button:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.state-card,
+.empty-state {
+  display: grid;
+  place-items: center;
+  gap: 0.85rem;
+  border: 1px dashed rgba(148, 163, 184, 0.26);
+  border-radius: 1.2rem;
+  background: rgba(2, 6, 23, 0.34);
+  color: #cbd5e1;
+  padding: clamp(2rem, 7vw, 4rem) 1.25rem;
+  text-align: center;
+}
+
+.empty-state {
+  min-height: 24rem;
+}
+
+.empty-state h2,
+.state-card strong {
+  font-size: 1.35rem;
+  letter-spacing: -0.04em;
+}
+
+.empty-state p {
+  max-width: 30rem;
+}
+
+.empty-icon {
+  width: 3.4rem;
+  height: 3.4rem;
+  display: grid;
+  place-items: center;
+  border-radius: 1rem;
+  background: rgba(34, 197, 94, 0.12);
+  color: #86efac;
+  font-size: 2rem;
+  font-weight: 800;
+}
+
+.loading-state {
+  min-height: 16rem;
+}
+
+.spinner {
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid rgba(148, 163, 184, 0.24);
+  border-top-color: #22c55e;
+  border-radius: 999px;
+  animation: spin 800ms linear infinite;
+}
+
+.error-state {
+  border-color: rgba(248, 113, 113, 0.32);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 44rem) {
+  .section-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .primary-button,
+  .secondary-button,
+  .ghost-button {
+    width: 100%;
+  }
+}
