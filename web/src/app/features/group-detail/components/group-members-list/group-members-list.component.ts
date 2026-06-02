@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 import type { GroupMemberView } from '../../../../core/groups/groups.models';
 
@@ -9,4 +9,7 @@ import type { GroupMemberView } from '../../../../core/groups/groups.models';
 })
 export class GroupMembersListComponent {
   @Input({ required: true }) members: GroupMemberView[] = [];
+  @Input({ required: true }) canManageMembers = false;
+
+  @Output() readonly addMemberRequested = new EventEmitter<void>();
 }
