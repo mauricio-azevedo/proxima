@@ -1,12 +1,21 @@
 {
   "name": "proxima",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "web",
+    "api"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "web": "npm run start -w web",
     "api": "npm run start:dev -w api",
-    "dev": "concurrently \"npm run web\" \"npm run api\""
+    "dev": "concurrently \"npm run web\" \"npm run api\"",
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "lint:fix": "npm run lint:fix --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run lint"
   },
   "repository": {
     "type": "git",
@@ -20,12 +29,8 @@
   },
   "homepage": "https://github.com/mauricio-azevedo/proxima#readme",
   "description": "",
-  "private": "true",
-  "workspaces": [
-    "web",
-    "api"
-  ],
   "devDependencies": {
-    "concurrently": "^10.0.1"
+    "concurrently": "^10.0.1",
+    "prettier": "^3.8.1"
   }
 }
