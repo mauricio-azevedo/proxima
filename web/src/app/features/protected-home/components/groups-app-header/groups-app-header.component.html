@@ -1,0 +1,8 @@
+<header class="app-header" aria-label="Cabeçalho do aplicativo">
+  <a class="brand-mark" href="/app" aria-label="Próxima">Próxima</a>
+
+  <div class="account-area">
+    <span>{{ nickname }}</span>
+    <button class="quiet-button" type="button" (click)="logoutRequested.emit()">Sair</button>
+  </div>
+</header>
