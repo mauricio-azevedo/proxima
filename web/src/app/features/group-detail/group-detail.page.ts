@@ -1,11 +1,12 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
+import { AuthService } from '../../core/auth/auth.service';
 import type { GroupMemberView, GroupView } from '../../core/groups/groups.models';
 import { GroupsService } from '../../core/groups/groups.service';
 import { AppShellComponent } from '../../shared/app-shell/app-shell.component';
 import { AddGroupMemberDialogComponent } from './components/add-group-member-dialog/add-group-member-dialog.component';
 import { GroupMembersListComponent } from './components/group-members-list/group-members-list.component';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-group-detail-page',
@@ -15,6 +16,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class GroupDetailPage implements OnInit {
   private readonly route = inject(ActivatedRoute);
+  private readonly authService = inject(AuthService);
   private readonly groupsService = inject(GroupsService);
 
   readonly group = signal<GroupView | null>(null);
@@ -98,6 +100,10 @@ export class GroupDetailPage implements OnInit {
         this.addMemberErrorMessage.set('Não foi possível adicionar o membro. Tente novamente.');
       },
     });
+  }
+
+  logout(): void {
+    this.authService.logout();
   }
 
   private loadMembers(): void {
