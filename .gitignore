@@ -1,3 +1,12 @@
 node_modules
 .idea
 .env
+
+# build outputs
+dist
+api/dist
+web/dist
+
+# generated files
+api/generated
+api/src/generated
