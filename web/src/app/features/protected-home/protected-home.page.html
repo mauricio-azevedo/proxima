@@ -1,101 +1,139 @@
 <main class="groups-page">
-  <header class="groups-header">
-    <div>
-      <p class="eyebrow">Próxima</p>
-      <h1>Meus grupos</h1>
-      <p>Olá, {{ user()?.nickname }}. Crie ou acesse um grupo para organizar as próximas peladas.</p>
-    </div>
+  <header class="app-header" aria-label="Cabeçalho do aplicativo">
+    <a class="brand-mark" href="/app" aria-label="Próxima">Próxima</a>
 
-    <button class="secondary-button" type="button" (click)="logout()">Sair</button>
+    <div class="account-area">
+      <span>{{ user()?.nickname }}</span>
+      <button class="quiet-button" type="button" (click)="logout()">Sair</button>
+    </div>
   </header>
 
-  <section class="groups-layout">
-    <section class="panel create-panel" aria-labelledby="create-group-title">
-      <div class="panel-header">
-        <h2 id="create-group-title">Criar grupo</h2>
-        <p>Comece criando o grupo da sua turma. Depois você adiciona os jogadores.</p>
-      </div>
+  <section class="page-hero">
+    <div>
+      <p class="eyebrow">Meus grupos</p>
+      <h1>Escolha uma turma para organizar a próxima.</h1>
+      <p>Gerencie grupos, jogadores e peladas a partir de um lugar simples.</p>
+    </div>
 
-      <form class="create-form" [formGroup]="form" (ngSubmit)="createGroup()" novalidate>
-        @if (createErrorMessage()) {
-          <p class="alert-message" role="alert">{{ createErrorMessage() }}</p>
-        }
-
-        <div class="form-field">
-          <label for="groupName">Nome do grupo</label>
-          <input
-            id="groupName"
-            class="text-input"
-            type="text"
-            formControlName="name"
-            autocomplete="off"
-            placeholder="Ex: Futebol de quinta"
-            [attr.aria-invalid]="shouldShowError(name) ? 'true' : 'false'"
-            [attr.aria-describedby]="shouldShowError(name) ? 'group-name-error' : 'group-name-hint'"
-          />
-
-          @if (shouldShowError(name)) {
-            <p id="group-name-error" class="field-error">
-              @if (name.hasError('required')) {
-                Informe o nome do grupo.
-              } @else if (name.hasError('minlength')) {
-                Use pelo menos 2 caracteres.
-              } @else {
-                Use no máximo 80 caracteres.
-              }
-            </p>
-          } @else {
-            <p id="group-name-hint" class="field-hint">Você poderá editar esse nome depois.</p>
-          }
-        </div>
-
-        <button class="primary-button" type="submit" [disabled]="isCreating()">
-          {{ isCreating() ? 'Criando...' : 'Criar grupo' }}
-        </button>
-      </form>
-    </section>
-
-    <section class="panel list-panel" aria-labelledby="groups-list-title">
-      <div class="panel-header list-header">
-        <div>
-          <h2 id="groups-list-title">Grupos</h2>
-          <p>Escolha um grupo para continuar.</p>
-        </div>
-
-        <button class="ghost-button" type="button" (click)="loadGroups()" [disabled]="isLoading()">
-          Atualizar
-        </button>
-      </div>
-
-      @if (isLoading()) {
-        <div class="state-card">Carregando seus grupos...</div>
-      } @else if (loadErrorMessage()) {
-        <div class="state-card error-state">
-          <p>{{ loadErrorMessage() }}</p>
-          <button class="secondary-button" type="button" (click)="loadGroups()">Tentar novamente</button>
-        </div>
-      } @else if (!hasGroups()) {
-        <div class="state-card empty-state">
-          <strong>Nenhum grupo ainda</strong>
-          <span>Crie seu primeiro grupo para começar a organizar a fila da pelada.</span>
-        </div>
-      } @else {
-        <div class="groups-list">
-          @for (group of groups(); track group.id) {
-            <article class="group-card">
-              <div>
-                <h3>{{ group.name }}</h3>
-                <p>
-                  {{ group._count.members }} membro{{ group._count.members === 1 ? '' : 's' }} ·
-                  {{ group._count.peladas }} pelada{{ group._count.peladas === 1 ? '' : 's' }}
-                </p>
-              </div>
-
-              <span class="role-pill">{{ group.members[0]?.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
-            </article>
-          }
-        </div>
-      }
-    </section>
+    @if (hasGroups()) {
+      <button class="primary-button" type="button" (click)="openCreateDialog()">Novo grupo</button>
+    }
   </section>
+
+  <section class="groups-content" aria-labelledby="groups-title">
+    <div class="section-header">
+      <div>
+        <h2 id="groups-title">Grupos</h2>
+        <p>{{ groups().length }} grupo{{ groups().length === 1 ? '' : 's' }} encontrado{{ groups().length === 1 ? '' : 's' }}</p>
+      </div>
+
+      <button class="ghost-button" type="button" (click)="loadGroups()" [disabled]="isLoading()">Atualizar</button>
+    </div>
+
+    @if (isLoading()) {
+      <div class="state-card loading-state" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <p>Carregando seus grupos...</p>
+      </div>
+    } @else if (loadErrorMessage()) {
+      <div class="state-card error-state" role="alert">
+        <strong>Não conseguimos carregar seus grupos.</strong>
+        <p>{{ loadErrorMessage() }}</p>
+        <button class="secondary-button" type="button" (click)="loadGroups()">Tentar novamente</button>
+      </div>
+    } @else if (!hasGroups()) {
+      <div class="empty-state">
+        <div class="empty-icon" aria-hidden="true">+</div>
+        <h2>Crie seu primeiro grupo</h2>
+        <p>Depois disso você poderá adicionar jogadores, criar peladas e controlar quem entra na próxima partida.</p>
+        <button class="primary-button" type="button" (click)="openCreateDialog()">Criar grupo</button>
+      </div>
+    } @else {
+      <div class="groups-grid">
+        @for (group of groups(); track group.id) {
+          <article class="group-card">
+            <div class="group-card-main">
+              <span class="role-pill">{{ group.members[0]?.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
+              <h3>{{ group.name }}</h3>
+              <p>
+                {{ group._count.members }} membro{{ group._count.members === 1 ? '' : 's' }} ·
+                {{ group._count.peladas }} pelada{{ group._count.peladas === 1 ? '' : 's' }}
+              </p>
+            </div>
+
+            <button class="card-action" type="button" disabled title="Detalhe do grupo vem na próxima etapa">
+              Abrir em breve
+            </button>
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+  @if (isCreateDialogOpen()) {
+    <div class="dialog-backdrop" role="presentation" (click)="closeCreateDialog()">
+      <section
+        class="dialog-card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="create-group-title"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="dialog-header">
+          <div>
+            <p class="eyebrow">Novo grupo</p>
+            <h2 id="create-group-title">Criar grupo</h2>
+            <p>Dê um nome simples para a turma. Você poderá adicionar jogadores depois.</p>
+          </div>
+
+          <button class="icon-button" type="button" aria-label="Fechar" (click)="closeCreateDialog()" [disabled]="isCreating()">
+            ×
+          </button>
+        </div>
+
+        <form class="create-form" [formGroup]="form" (ngSubmit)="createGroup()" novalidate>
+          @if (createErrorMessage()) {
+            <p class="alert-message" role="alert">{{ createErrorMessage() }}</p>
+          }
+
+          <div class="form-field">
+            <label for="groupName">Nome do grupo</label>
+            <input
+              id="groupName"
+              class="text-input"
+              type="text"
+              formControlName="name"
+              autocomplete="off"
+              placeholder="Ex: Futebol de quinta"
+              [attr.aria-invalid]="shouldShowError(name) ? 'true' : 'false'"
+              [attr.aria-describedby]="shouldShowError(name) ? 'group-name-error' : 'group-name-hint'"
+            />
+
+            @if (shouldShowError(name)) {
+              <p id="group-name-error" class="field-error">
+                @if (name.hasError('required')) {
+                  Informe o nome do grupo.
+                } @else if (name.hasError('minlength')) {
+                  Use pelo menos 2 caracteres.
+                } @else {
+                  Use no máximo 80 caracteres.
+                }
+              </p>
+            } @else {
+              <p id="group-name-hint" class="field-hint">Exemplo: Futebol de quinta, Arena sábado, Time da firma.</p>
+            }
+          </div>
+
+          <div class="dialog-actions">
+            <button class="secondary-button" type="button" (click)="closeCreateDialog()" [disabled]="isCreating()">
+              Cancelar
+            </button>
+            <button class="primary-button" type="submit" [disabled]="isCreating()">
+              {{ isCreating() ? 'Criando...' : 'Criar grupo' }}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
 </main>
