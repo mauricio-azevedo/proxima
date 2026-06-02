@@ -1,19 +1,18 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { API_BASE_URL } from '../config/api.config';
+import { ApiHttpService } from '../http/api-http.service';
 import type { CreateGroupRequest, GroupView } from './groups.models';
 
 @Injectable({ providedIn: 'root' })
 export class GroupsService {
-  constructor(private readonly http: HttpClient) {}
+  constructor(private readonly apiHttp: ApiHttpService) {}
 
   findAll(): Observable<GroupView[]> {
-    return this.http.get<GroupView[]>(`${API_BASE_URL}/groups`);
+    return this.apiHttp.get<GroupView[]>('/groups');
   }
 
   create(payload: CreateGroupRequest): Observable<GroupView> {
-    return this.http.post<GroupView>(`${API_BASE_URL}/groups`, payload);
+    return this.apiHttp.post<GroupView, CreateGroupRequest>('/groups', payload);
   }
 }
