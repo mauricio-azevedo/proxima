@@ -1,0 +1,48 @@
+<main class="app-shell">
+  <header class="top-bar">
+    <div class="brand-area">
+      @if (showBackLink) {
+        <a class="back-link" routerLink="/app" aria-label="Voltar para grupos">←</a>
+      }
+
+      <a class="brand" routerLink="/app" aria-label="Próxima">Próxima</a>
+    </div>
+
+    <button class="logout-button" type="button" (click)="logoutRequested.emit()">Sair</button>
+  </header>
+
+  <section class="page-header">
+    <div>
+      <p class="eyebrow">{{ eyebrow }}</p>
+      <h1>{{ title }}</h1>
+      @if (subtitle) {
+        <p class="subtitle">{{ subtitle }}</p>
+      }
+    </div>
+
+    @if (actionLabel) {
+      <button class="primary-action" type="button" (click)="primaryActionRequested.emit()">
+        {{ actionLabel }}
+      </button>
+    }
+  </section>
+
+  <section class="content-shell">
+    <ng-content />
+  </section>
+
+  <nav class="bottom-nav" aria-label="Navegação principal">
+    <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+      <span>🏟️</span>
+      Grupos
+    </a>
+    <a class="disabled" aria-disabled="true">
+      <span>⚽</span>
+      Peladas
+    </a>
+    <a class="disabled" aria-disabled="true">
+      <span>👤</span>
+      Perfil
+    </a>
+  </nav>
+</main>
