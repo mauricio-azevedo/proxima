@@ -3,6 +3,7 @@ import { Injectable, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 
+import { API_BASE_URL } from '../config/api.config';
 import type { AuthResponse, AuthUser, LoginPayload, RegisterPayload } from './auth.models';
 
 const ACCESS_TOKEN_KEY = 'proxima_access_token';
@@ -10,7 +11,6 @@ const USER_KEY = 'proxima_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:3000';
   private readonly accessTokenSignal = signal<string | null>(this.loadStoredToken());
   private readonly currentUserSignal = signal<AuthUser | null>(this.loadStoredUser());
 
@@ -28,13 +28,13 @@ export class AuthService {
 
   register(payload: RegisterPayload): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/auth/register`, payload)
+      .post<AuthResponse>(`${API_BASE_URL}/auth/register`, payload)
       .pipe(tap((response) => this.saveSession(response)));
   }
 
   login(payload: LoginPayload): Observable<AuthResponse> {
     return this.http
-      .post<AuthResponse>(`${this.apiUrl}/auth/login`, payload)
+      .post<AuthResponse>(`${API_BASE_URL}/auth/login`, payload)
       .pipe(tap((response) => this.saveSession(response)));
   }
 
