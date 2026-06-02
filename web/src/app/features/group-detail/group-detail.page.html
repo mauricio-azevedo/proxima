@@ -1,0 +1,41 @@
+<main class="group-detail-page">
+  <a class="back-link" routerLink="/app">← Meus grupos</a>
+
+  @if (isLoading()) {
+    <section class="state-card">Carregando grupo...</section>
+  } @else if (loadErrorMessage()) {
+    <section class="state-card error-state">
+      <strong>Algo deu errado</strong>
+      <p>{{ loadErrorMessage() }}</p>
+      <button type="button" class="secondary-button" (click)="loadPage()">Tentar novamente</button>
+    </section>
+  } @else if (group()) {
+    <header class="group-header">
+      <div>
+        <p class="eyebrow">Grupo</p>
+        <h1>{{ group()?.name }}</h1>
+        <p>
+          {{ group()?._count?.members }} membro{{ group()?._count?.members === 1 ? '' : 's' }} ·
+          {{ group()?._count?.peladas }} pelada{{ group()?._count?.peladas === 1 ? '' : 's' }}
+        </p>
+      </div>
+
+      @if (canManageMembers()) {
+        <button type="button" class="primary-button" (click)="openAddMemberDialog()">
+          Adicionar membro
+        </button>
+      }
+    </header>
+
+    <app-group-members-list [members]="members()" />
+  }
+
+  @if (isAddMemberDialogOpen()) {
+    <app-add-group-member-dialog
+      [isSubmitting]="isAddingMember()"
+      [errorMessage]="addMemberErrorMessage()"
+      (closed)="closeAddMemberDialog()"
+      (submitted)="addMember($event)"
+    />
+  }
+</main>
