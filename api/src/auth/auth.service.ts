@@ -32,9 +32,7 @@ export class AuthService {
     }
 
     if (password.length < 6) {
-      throw new BadRequestException(
-        'Password must have at least 6 characters.',
-      );
+      throw new BadRequestException('Password must have at least 6 characters.');
     }
 
     const existingUser = await this.prisma.user.findUnique({
@@ -82,10 +80,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials.');
     }
 
-    const passwordMatches = await this.passwordService.verify(
-      password,
-      user.passwordHash,
-    );
+    const passwordMatches = await this.passwordService.verify(password, user.passwordHash);
 
     if (!passwordMatches) {
       throw new UnauthorizedException('Invalid credentials.');

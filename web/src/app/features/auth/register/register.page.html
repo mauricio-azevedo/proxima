@@ -36,7 +36,7 @@
 
       <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
         @if (errorMessage()) {
-          <p class="auth-alert" role="alert">{{ errorMessage() }}</p>
+        <p class="auth-alert" role="alert">{{ errorMessage() }}</p>
         }
 
         <div class="auth-form-grid">
@@ -53,7 +53,7 @@
             />
 
             @if (shouldShowError(firstName)) {
-              <p id="first-name-error" class="field-error">Informe seu nome.</p>
+            <p id="first-name-error" class="field-error">Informe seu nome.</p>
             }
           </div>
 
@@ -70,7 +70,7 @@
             />
 
             @if (shouldShowError(lastName)) {
-              <p id="last-name-error" class="field-error">Informe seu sobrenome.</p>
+            <p id="last-name-error" class="field-error">Informe seu sobrenome.</p>
             }
           </div>
         </div>
@@ -88,7 +88,7 @@
           />
 
           @if (shouldShowError(nickname)) {
-            <p id="nickname-error" class="field-error">Informe seu apelido.</p>
+          <p id="nickname-error" class="field-error">Informe seu apelido.</p>
           }
         </div>
 
@@ -106,13 +106,10 @@
           />
 
           @if (shouldShowError(email)) {
-            <p id="email-error" class="field-error">
-              @if (email.hasError('required')) {
-                Informe seu email.
-              } @else {
-                Informe um email válido.
-              }
-            </p>
+          <p id="email-error" class="field-error">
+            @if (email.hasError('required')) { Informe seu email. } @else { Informe um email válido.
+            }
+          </p>
           }
         </div>
 
@@ -131,15 +128,12 @@
           />
 
           @if (shouldShowError(password)) {
-            <p id="password-error" class="field-error">
-              @if (password.hasError('minlength')) {
-                Use pelo menos 6 caracteres.
-              } @else {
-                Informe uma senha.
-              }
-            </p>
+          <p id="password-error" class="field-error">
+            @if (password.hasError('minlength')) { Use pelo menos 6 caracteres. } @else { Informe
+            uma senha. }
+          </p>
           } @else {
-            <p id="password-hint" class="field-hint">Use pelo menos 6 caracteres.</p>
+          <p id="password-hint" class="field-hint">Use pelo menos 6 caracteres.</p>
           }
         </div>
 

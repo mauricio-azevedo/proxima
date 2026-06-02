@@ -37,7 +37,7 @@
 
       <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
         @if (errorMessage()) {
-          <p class="auth-alert" role="alert">{{ errorMessage() }}</p>
+        <p class="auth-alert" role="alert">{{ errorMessage() }}</p>
         }
 
         <div class="form-field">
@@ -54,13 +54,10 @@
           />
 
           @if (shouldShowError(email)) {
-            <p id="email-error" class="field-error">
-              @if (email.hasError('required')) {
-                Informe seu email.
-              } @else {
-                Informe um email válido.
-              }
-            </p>
+          <p id="email-error" class="field-error">
+            @if (email.hasError('required')) { Informe seu email. } @else { Informe um email válido.
+            }
+          </p>
           }
         </div>
 
@@ -77,7 +74,7 @@
           />
 
           @if (shouldShowError(password)) {
-            <p id="password-error" class="field-error">Informe sua senha.</p>
+          <p id="password-error" class="field-error">Informe sua senha.</p>
           }
         </div>
 

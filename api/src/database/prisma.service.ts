@@ -1,22 +1,14 @@
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
 import { PrismaClient } from '../../generated/prisma';
 
 @Injectable()
-export class PrismaService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
-  constructor() {
-    const databaseUrl = process.env.DATABASE_URL;
-
-    if (!databaseUrl) {
-      throw new Error('DATABASE_URL is required.');
-    }
-
+export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  constructor(configService: ConfigService) {
     const adapter = new PrismaNeon({
-      connectionString: databaseUrl,
+      connectionString: configService.getOrThrow<string>('DATABASE_URL'),
     });
 
     super({ adapter });
