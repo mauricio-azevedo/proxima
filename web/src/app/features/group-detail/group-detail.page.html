@@ -5,6 +5,7 @@
   [showBackLink]="true"
   [actionLabel]="canManageMembers() ? 'Adicionar membro' : ''"
   (primaryActionRequested)="openAddMemberDialog()"
+  (logoutRequested)="logout()"
 >
   @if (isLoading()) {
     <section class="state-card loading-state" aria-live="polite">
