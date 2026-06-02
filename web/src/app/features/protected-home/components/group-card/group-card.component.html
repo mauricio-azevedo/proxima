@@ -8,7 +8,5 @@
     </p>
   </div>
 
-  <button class="card-action" type="button" disabled title="Detalhe do grupo vem na próxima etapa">
-    Abrir em breve
-  </button>
+  <a class="card-action" [routerLink]="['/groups', group.id]">Abrir grupo</a>
 </article>
