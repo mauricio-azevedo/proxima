@@ -1,15 +1,28 @@
 <section class="members-panel" aria-labelledby="members-title">
   <div class="section-header">
     <div>
+      <p class="eyebrow">Elenco</p>
       <h2 id="members-title">Membros</h2>
-      <p>{{ members.length }} membro{{ members.length === 1 ? '' : 's' }} no grupo</p>
+      <p>{{ members.length }} jogador{{ members.length === 1 ? '' : 'es' }} disponível{{ members.length === 1 ? '' : 'is' }}</p>
     </div>
+
+    @if (canManageMembers) {
+      <button class="secondary-button" type="button" (click)="addMemberRequested.emit()">
+        Adicionar
+      </button>
+    }
   </div>
 
   @if (members.length === 0) {
     <div class="empty-state">
-      <strong>Nenhum membro ainda</strong>
-      <p>Adicione os jogadores da sua turma para começar a criar peladas.</p>
+      <div class="empty-icon" aria-hidden="true">⚽</div>
+      <strong>Nenhum jogador ainda</strong>
+      <p>Adicione a turma para começar a organizar peladas e montar a próxima.</p>
+      @if (canManageMembers) {
+        <button class="primary-button" type="button" (click)="addMemberRequested.emit()">
+          Adicionar primeiro membro
+        </button>
+      }
     </div>
   } @else {
     <div class="members-list">
@@ -21,7 +34,7 @@
 
           <div class="member-info">
             <h3>{{ member.user.nickname }}</h3>
-            <p>{{ member.user.status === 'PLACEHOLDER' ? 'Adicionado pelo grupo' : member.user.email }}</p>
+            <p>{{ member.user.status === 'PLACEHOLDER' ? 'Jogador convidado' : member.user.email }}</p>
           </div>
 
           <span class="role-pill">{{ member.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
