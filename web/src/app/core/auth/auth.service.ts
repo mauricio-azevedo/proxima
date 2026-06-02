@@ -1,9 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 
-import { API_BASE_URL } from '../config/api.config';
+import { ApiHttpService } from '../http/api-http.service';
 import type { AuthResponse, AuthUser, LoginPayload, RegisterPayload } from './auth.models';
 
 const ACCESS_TOKEN_KEY = 'proxima_access_token';
@@ -18,7 +17,7 @@ export class AuthService {
   readonly isAuthenticated = computed(() => Boolean(this.accessTokenSignal()));
 
   constructor(
-    private readonly http: HttpClient,
+    private readonly apiHttp: ApiHttpService,
     private readonly router: Router,
   ) {}
 
@@ -27,14 +26,14 @@ export class AuthService {
   }
 
   register(payload: RegisterPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${API_BASE_URL}/auth/register`, payload)
+    return this.apiHttp
+      .post<AuthResponse, RegisterPayload>('/auth/register', payload)
       .pipe(tap((response) => this.saveSession(response)));
   }
 
   login(payload: LoginPayload): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${API_BASE_URL}/auth/login`, payload)
+    return this.apiHttp
+      .post<AuthResponse, LoginPayload>('/auth/login', payload)
       .pipe(tap((response) => this.saveSession(response)));
   }
 
