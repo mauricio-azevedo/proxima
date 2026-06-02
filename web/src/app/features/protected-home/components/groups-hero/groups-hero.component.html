@@ -1,0 +1,13 @@
+<section class="page-hero">
+  <div>
+    <p class="eyebrow">Meus grupos</p>
+    <h1>Escolha uma turma para organizar a próxima.</h1>
+    <p>Gerencie grupos, jogadores e peladas a partir de um lugar simples.</p>
+  </div>
+
+  @if (hasGroups) {
+    <button class="primary-button" type="button" (click)="createGroupRequested.emit()">
+      Novo grupo
+    </button>
+  }
+</section>
