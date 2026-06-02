@@ -1,24 +1,3 @@
-.groups-page {
-  min-height: 100dvh;
-  padding: 1.25rem;
-  background: #0b1120;
-  color: #f8fafc;
-}
-
 :host {
   display: block;
-}
-
-app-groups-app-header,
-app-groups-hero,
-app-groups-list {
-  display: block;
-  width: min(100%, 72rem);
-  margin-inline: auto;
-}
-
-@media (max-width: 44rem) {
-  .groups-page {
-    padding: 1rem;
-  }
 }
