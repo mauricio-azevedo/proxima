@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 
 import { AuthService } from '../../core/auth/auth.service';
 
@@ -8,9 +8,9 @@ import { AuthService } from '../../core/auth/auth.service';
   styleUrl: './protected-home.page.scss',
 })
 export class ProtectedHomePage {
-  readonly user = this.authService.currentUser;
+  private readonly authService = inject(AuthService);
 
-  constructor(private readonly authService: AuthService) {}
+  readonly user = this.authService.currentUser;
 
   logout(): void {
     this.authService.logout();
