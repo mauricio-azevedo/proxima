@@ -2,13 +2,13 @@
   <div class="section-header">
     <div>
       <p class="eyebrow">Elenco</p>
-      <h2 id="members-title">Membros</h2>
+      <h2 id="members-title">Membros do grupo</h2>
       <p>{{ members.length }} jogador{{ members.length === 1 ? '' : 'es' }} disponível{{ members.length === 1 ? '' : 'is' }}</p>
     </div>
 
     @if (canManageMembers) {
       <button class="secondary-button" type="button" (click)="addMemberRequested.emit()">
-        Adicionar
+        + Membro
       </button>
     }
   </div>
@@ -16,8 +16,8 @@
   @if (members.length === 0) {
     <div class="empty-state">
       <div class="empty-icon" aria-hidden="true">⚽</div>
-      <strong>Nenhum jogador ainda</strong>
-      <p>Adicione a turma para começar a organizar peladas e montar a próxima.</p>
+      <strong>Monte sua turma</strong>
+      <p>Adicione os jogadores que costumam participar. Depois a pelada nasce a partir dessa lista.</p>
       @if (canManageMembers) {
         <button class="primary-button" type="button" (click)="addMemberRequested.emit()">
           Adicionar primeiro membro
@@ -34,7 +34,7 @@
 
           <div class="member-info">
             <h3>{{ member.user.nickname }}</h3>
-            <p>{{ member.user.status === 'PLACEHOLDER' ? 'Jogador convidado' : member.user.email }}</p>
+            <p>{{ member.user.status === 'PLACEHOLDER' ? 'Jogador adicionado manualmente' : member.user.email }}</p>
           </div>
 
           <span class="role-pill">{{ member.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
