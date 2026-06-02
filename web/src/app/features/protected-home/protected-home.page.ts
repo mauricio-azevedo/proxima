@@ -1,35 +1,21 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import type { AbstractControl, ValidationErrors } from '@angular/forms';
-import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 import { AuthService } from '../../core/auth/auth.service';
 import type { GroupView } from '../../core/groups/groups.models';
 import { GroupsService } from '../../core/groups/groups.service';
-
-const MIN_GROUP_NAME_LENGTH = 2;
-const MAX_GROUP_NAME_LENGTH = 80;
-
-function groupNameValidator(control: AbstractControl): ValidationErrors | null {
-  const value = typeof control.value === 'string' ? control.value.trim() : '';
-
-  if (!value) {
-    return { required: true };
-  }
-
-  if (value.length < MIN_GROUP_NAME_LENGTH) {
-    return { minlength: true };
-  }
-
-  if (value.length > MAX_GROUP_NAME_LENGTH) {
-    return { maxlength: true };
-  }
-
-  return null;
-}
+import { CreateGroupDialogComponent } from './components/create-group-dialog/create-group-dialog.component';
+import { GroupsAppHeaderComponent } from './components/groups-app-header/groups-app-header.component';
+import { GroupsHeroComponent } from './components/groups-hero/groups-hero.component';
+import { GroupsListComponent } from './components/groups-list/groups-list.component';
 
 @Component({
   selector: 'app-protected-home-page',
-  imports: [ReactiveFormsModule],
+  imports: [
+    CreateGroupDialogComponent,
+    GroupsAppHeaderComponent,
+    GroupsHeroComponent,
+    GroupsListComponent,
+  ],
   templateUrl: './protected-home.page.html',
   styleUrl: './protected-home.page.scss',
 })
@@ -42,22 +28,9 @@ export class ProtectedHomePage implements OnInit {
   readonly isLoading = signal(true);
   readonly isCreating = signal(false);
   readonly isCreateDialogOpen = signal(false);
-  readonly wasSubmitted = signal(false);
   readonly loadErrorMessage = signal('');
   readonly createErrorMessage = signal('');
-
-  readonly form = new FormGroup({
-    name: new FormControl('', {
-      nonNullable: true,
-      validators: [groupNameValidator],
-    }),
-  });
-
   readonly hasGroups = computed(() => this.groups().length > 0);
-
-  get name(): FormControl<string> {
-    return this.form.controls.name;
-  }
 
   ngOnInit(): void {
     this.loadGroups();
@@ -80,7 +53,7 @@ export class ProtectedHomePage implements OnInit {
   }
 
   openCreateDialog(): void {
-    this.resetCreateForm();
+    this.createErrorMessage.set('');
     this.isCreateDialogOpen.set(true);
   }
 
@@ -90,20 +63,11 @@ export class ProtectedHomePage implements OnInit {
     }
 
     this.isCreateDialogOpen.set(false);
-    this.resetCreateForm();
+    this.createErrorMessage.set('');
   }
 
-  createGroup(): void {
-    this.wasSubmitted.set(true);
+  createGroup(name: string): void {
     this.createErrorMessage.set('');
-
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    const name = this.name.value.trim();
-
     this.isCreating.set(true);
 
     this.groupsService.create({ name }).subscribe({
@@ -111,7 +75,6 @@ export class ProtectedHomePage implements OnInit {
         this.groups.update((groups) => [group, ...groups.filter((current) => current.id !== group.id)]);
         this.isCreating.set(false);
         this.isCreateDialogOpen.set(false);
-        this.resetCreateForm();
       },
       error: () => {
         this.isCreating.set(false);
@@ -122,15 +85,5 @@ export class ProtectedHomePage implements OnInit {
 
   logout(): void {
     this.authService.logout();
-  }
-
-  shouldShowError(control: AbstractControl): boolean {
-    return control.invalid && (control.touched || this.wasSubmitted());
-  }
-
-  private resetCreateForm(): void {
-    this.form.reset({ name: '' });
-    this.wasSubmitted.set(false);
-    this.createErrorMessage.set('');
   }
 }
