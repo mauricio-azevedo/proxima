@@ -1,46 +1,94 @@
-<main class="auth-page">
-  <section class="auth-card">
-    <div class="auth-header">
-      <p class="eyebrow">Próxima</p>
-      <h1>Entrar</h1>
-      <p>Entre para gerenciar seus grupos e peladas.</p>
-    </div>
+<main class="auth-screen">
+  <section class="auth-shell" aria-labelledby="login-title">
+    <aside class="auth-brand-panel">
+      <a class="auth-logo" routerLink="/">Próxima</a>
 
-    <form class="auth-form" (ngSubmit)="submit()">
-      <label>
-        Email
-        <input
-          name="email"
-          type="email"
-          autocomplete="email"
-          [ngModel]="email()"
-          (ngModelChange)="email.set($event)"
-        />
-      </label>
+      <div class="auth-brand-copy">
+        <p class="auth-kicker">Gestão de peladas</p>
+        <h1 id="login-title">Organize quem joga agora e quem entra na próxima.</h1>
+        <p>
+          Controle grupos, jogadores, fila, partidas e placar em um fluxo feito para a dinâmica real da pelada.
+        </p>
+      </div>
 
-      <label>
-        Senha
-        <input
-          name="password"
-          type="password"
-          autocomplete="current-password"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-        />
-      </label>
+      <div class="auth-highlights" aria-label="Principais benefícios">
+        <div>
+          <strong>Fila clara</strong>
+          <span>Times de fora agrupados automaticamente.</span>
+        </div>
+        <div>
+          <strong>Histórico</strong>
+          <span>Partidas, placares e jogadores registrados.</span>
+        </div>
+        <div>
+          <strong>Sem bagunça</strong>
+          <span>Menos conversa perdida, mais jogo rodando.</span>
+        </div>
+      </div>
+    </aside>
 
-      @if (errorMessage()) {
-        <p class="error-message">{{ errorMessage() }}</p>
-      }
+    <section class="auth-card" aria-label="Formulário de login">
+      <div class="auth-card-header">
+        <p class="auth-kicker">Bem-vindo de volta</p>
+        <h2>Entrar na sua conta</h2>
+        <p>Acesse seus grupos e continue organizando suas peladas.</p>
+      </div>
 
-      <button type="submit" [disabled]="isSubmitting()">
-        {{ isSubmitting() ? 'Entrando...' : 'Entrar' }}
-      </button>
-    </form>
+      <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (errorMessage()) {
+          <p class="auth-alert" role="alert">{{ errorMessage() }}</p>
+        }
 
-    <p class="auth-footer">
-      Ainda não tem conta?
-      <a routerLink="/register">Cadastre-se</a>
-    </p>
+        <div class="form-field">
+          <label for="email">Email</label>
+          <input
+            id="email"
+            class="auth-control"
+            type="email"
+            autocomplete="email"
+            formControlName="email"
+            inputmode="email"
+            [attr.aria-invalid]="shouldShowError(email) ? 'true' : 'false'"
+            [attr.aria-describedby]="shouldShowError(email) ? 'email-error' : null"
+          />
+
+          @if (shouldShowError(email)) {
+            <p id="email-error" class="field-error">
+              @if (email.hasError('required')) {
+                Informe seu email.
+              } @else {
+                Informe um email válido.
+              }
+            </p>
+          }
+        </div>
+
+        <div class="form-field">
+          <label for="password">Senha</label>
+          <input
+            id="password"
+            class="auth-control"
+            type="password"
+            autocomplete="current-password"
+            formControlName="password"
+            [attr.aria-invalid]="shouldShowError(password) ? 'true' : 'false'"
+            [attr.aria-describedby]="shouldShowError(password) ? 'password-error' : null"
+          />
+
+          @if (shouldShowError(password)) {
+            <p id="password-error" class="field-error">Informe sua senha.</p>
+          }
+        </div>
+
+        <button class="auth-submit" type="submit" [disabled]="isSubmitting()">
+          {{ isSubmitting() ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+
+      <p class="auth-switch">
+        Ainda não tem conta?
+        <a routerLink="/register">Criar conta</a>
+      </p>
+    </section>
   </section>
 </main>
