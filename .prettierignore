@@ -1,0 +1,14 @@
+node_modules
+
+# build outputs
+dist
+api/dist
+web/dist
+
+# generated files
+api/generated
+api/src/generated
+coverage
+
+# package managers
+package-lock.json
