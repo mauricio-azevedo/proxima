@@ -1,14 +1,11 @@
-<main class="groups-page">
-  <app-groups-app-header
-    [nickname]="user()?.nickname"
-    (logoutRequested)="logout()"
-  />
-
-  <app-groups-hero
-    [hasGroups]="hasGroups()"
-    (createGroupRequested)="openCreateDialog()"
-  />
-
+<app-shell
+  eyebrow="Grupos"
+  title="Suas turmas"
+  subtitle="Entre em um grupo para gerenciar membros, peladas e a fila da próxima partida."
+  actionLabel="Novo grupo"
+  (primaryActionRequested)="openCreateDialog()"
+  (logoutRequested)="logout()"
+>
   <app-groups-list
     [groups]="groups()"
     [isLoading]="isLoading()"
@@ -25,4 +22,4 @@
       (submitted)="createGroup($event)"
     />
   }
-</main>
+</app-shell>
