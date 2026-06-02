@@ -1,0 +1,32 @@
+<section class="members-panel" aria-labelledby="members-title">
+  <div class="section-header">
+    <div>
+      <h2 id="members-title">Membros</h2>
+      <p>{{ members.length }} membro{{ members.length === 1 ? '' : 's' }} no grupo</p>
+    </div>
+  </div>
+
+  @if (members.length === 0) {
+    <div class="empty-state">
+      <strong>Nenhum membro ainda</strong>
+      <p>Adicione os jogadores da sua turma para começar a criar peladas.</p>
+    </div>
+  } @else {
+    <div class="members-list">
+      @for (member of members; track member.id) {
+        <article class="member-card">
+          <div class="avatar" aria-hidden="true">
+            {{ member.user.nickname.charAt(0).toUpperCase() }}
+          </div>
+
+          <div class="member-info">
+            <h3>{{ member.user.nickname }}</h3>
+            <p>{{ member.user.status === 'PLACEHOLDER' ? 'Adicionado pelo grupo' : member.user.email }}</p>
+          </div>
+
+          <span class="role-pill">{{ member.role === 'ADMIN' ? 'Admin' : 'Membro' }}</span>
+        </article>
+      }
+    </div>
+  }
+</section>
