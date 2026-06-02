@@ -2,6 +2,10 @@ node_modules
 .idea
 .env
 
+# framework caches
+.angular
+web/.angular
+
 # build outputs
 dist
 api/dist
