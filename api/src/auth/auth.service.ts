@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { PrismaService } from '../database/prisma.service';
-import { UserStatus } from '../generated/prisma';
+import { UserStatus } from '../../generated/prisma';
 import { JwtService } from './jwt.service';
 import { PasswordService } from './password.service';
 import { LoginDto } from './dto/login.dto';
