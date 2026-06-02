@@ -20,24 +20,29 @@ export class GroupsService {
   async create(userId: string, dto: CreateGroupDto) {
     const name = this.parseGroupName(dto.name);
 
-    return this.prisma.$transaction(async (transaction) => {
-      const group = await transaction.group.create({
+    const group = await this.prisma.$transaction(async (transaction) => {
+      const createdGroup = await transaction.group.create({
         data: {
           name,
           ownerId: userId,
+        },
+        select: {
+          id: true,
         },
       });
 
       await transaction.groupMember.create({
         data: {
-          groupId: group.id,
+          groupId: createdGroup.id,
           userId,
           role: GroupMemberRole.ADMIN,
         },
       });
 
-      return this.findOne(userId, group.id);
+      return createdGroup;
     });
+
+    return this.findOne(userId, group.id);
   }
 
   async findAll(userId: string) {
