@@ -1,14 +1,15 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
 
 import type { GroupMemberView, GroupView } from '../../core/groups/groups.models';
 import { GroupsService } from '../../core/groups/groups.service';
+import { AppShellComponent } from '../../shared/app-shell/app-shell.component';
 import { AddGroupMemberDialogComponent } from './components/add-group-member-dialog/add-group-member-dialog.component';
 import { GroupMembersListComponent } from './components/group-members-list/group-members-list.component';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-group-detail-page',
-  imports: [AddGroupMemberDialogComponent, GroupMembersListComponent, RouterLink],
+  imports: [AppShellComponent, AddGroupMemberDialogComponent, GroupMembersListComponent],
   templateUrl: './group-detail.page.html',
   styleUrl: './group-detail.page.scss',
 })
@@ -26,6 +27,16 @@ export class GroupDetailPage implements OnInit {
   readonly groupId = this.route.snapshot.paramMap.get('groupId') ?? '';
 
   readonly canManageMembers = computed(() => this.group()?.members[0]?.role === 'ADMIN');
+  readonly pageTitle = computed(() => this.group()?.name ?? 'Grupo');
+  readonly pageSubtitle = computed(() => {
+    const group = this.group();
+
+    if (!group) {
+      return 'Carregando detalhes do grupo.';
+    }
+
+    return `${group._count.members} membro${group._count.members === 1 ? '' : 's'} · ${group._count.peladas} pelada${group._count.peladas === 1 ? '' : 's'}`;
+  });
 
   ngOnInit(): void {
     this.loadPage();
