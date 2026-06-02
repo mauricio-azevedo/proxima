@@ -1,0 +1,61 @@
+.home-page {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.18), transparent 24rem),
+    #0f172a;
+}
+
+.home-card {
+  width: min(100%, 48rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  background: rgba(15, 23, 42, 0.9);
+  color: #e5e7eb;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.28);
+}
+
+.eyebrow {
+  margin: 0 0 0.5rem;
+  color: #86efac;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0 0 0.5rem;
+  font-size: clamp(2rem, 8vw, 3.5rem);
+  line-height: 1;
+}
+
+p {
+  margin: 0;
+  color: #94a3b8;
+}
+
+button {
+  border: 0;
+  border-radius: 0.9rem;
+  background: #22c55e;
+  color: #052e16;
+  font: inherit;
+  font-weight: 900;
+  padding: 0.95rem 1rem;
+  cursor: pointer;
+}
+
+@media (max-width: 40rem) {
+  .home-card {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
