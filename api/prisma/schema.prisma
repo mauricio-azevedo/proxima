@@ -12,27 +12,41 @@ enum UserStatus {
   PLACEHOLDER
 }
 
-enum GroupMemberRole {
+enum Weekday {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum PickupGameVisibility {
+  PRIVATE
+  PUBLIC
+}
+
+enum PickupGameAdminRole {
+  OWNER
   ADMIN
-  MEMBER
 }
 
-enum PeladaStatus {
-  OPEN
+enum GameDayStatus {
+  SCHEDULED
+  WAITING_FOR_PLAYERS
+  PLAYING
   FINISHED
-}
-
-enum PeladaPlayerStatus {
-  ACTIVE
-  ABSENT
+  CANCELLED
 }
 
 enum MatchStatus {
-  IN_PROGRESS
+  RUNNING
   FINISHED
+  CANCELLED
 }
 
-enum MatchTeam {
+enum MatchSide {
   A
   B
 }
@@ -49,142 +63,213 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  ownedGroups Group[]       @relation("GroupOwner")
-  memberships GroupMember[]
+  createdPickupGames      PickupGame[]       @relation("PickupGameCreator")
+  savedPickupGames        PickupGameUser[]
+  administeredPickupGames PickupGameAdmin[]
+  dayListEntries          DayListEntry[]
+  queueEntries            QueueEntry[]
+  matchPlayers            MatchPlayer[]
+
+  scoredGoals  GoalEvent[] @relation("GoalScorer")
+  assistedGoals GoalEvent[] @relation("GoalAssistant")
+  createdGoals GoalEvent[] @relation("GoalCreator")
+  updatedGoals GoalEvent[] @relation("GoalUpdater")
+  deletedGoals GoalEvent[] @relation("GoalDeleter")
 
   @@map("users")
 }
 
-model Group {
-  id      String @id @default(uuid())
-  name    String
-  ownerId String @map("owner_id")
+model PickupGame {
+  id                  String               @id @default(uuid())
+  name                String
+  locationName        String?              @map("location_name")
+  weekday             Weekday
+  startTime           String               @map("start_time")
+  defaultTeamSize     Int                  @default(5) @map("default_team_size")
+  visibility          PickupGameVisibility @default(PRIVATE)
+  createdByUserId     String               @map("created_by_user_id")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  owner   User          @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Restrict)
-  members GroupMember[]
-  peladas Pelada[]
+  createdBy User @relation("PickupGameCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
 
-  @@index([ownerId])
-  @@map("groups")
+  users  PickupGameUser[]
+  admins PickupGameAdmin[]
+  days   GameDay[]
+
+  @@index([createdByUserId])
+  @@index([visibility])
+  @@index([weekday, startTime])
+  @@map("pickup_games")
 }
 
-model GroupMember {
-  id      String          @id @default(uuid())
-  groupId String          @map("group_id")
-  userId  String          @map("user_id")
-  role    GroupMemberRole @default(MEMBER)
+model PickupGameUser {
+  id           String @id @default(uuid())
+  pickupGameId String @map("pickup_game_id")
+  userId       String @map("user_id")
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
 
-  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  pickupGame PickupGame @relation(fields: [pickupGameId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  peladaPlayers PeladaPlayer[]
-
-  @@unique([groupId, userId])
+  @@unique([pickupGameId, userId])
   @@index([userId])
-  @@map("group_members")
+  @@map("pickup_game_users")
 }
 
-model Pelada {
-  id             String       @id @default(uuid())
-  groupId         String       @map("group_id")
-  name            String
-  date            DateTime?
-  playersPerTeam  Int          @default(5) @map("players_per_team")
-  status          PeladaStatus @default(OPEN)
+model PickupGameAdmin {
+  id           String              @id @default(uuid())
+  pickupGameId String              @map("pickup_game_id")
+  userId       String              @map("user_id")
+  role         PickupGameAdminRole @default(ADMIN)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  pickupGame PickupGame @relation(fields: [pickupGameId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([pickupGameId, userId])
+  @@index([userId])
+  @@map("pickup_game_admins")
+}
+
+model GameDay {
+  id           String        @id @default(uuid())
+  pickupGameId String        @map("pickup_game_id")
+  date         DateTime      @db.Date
+  status       GameDayStatus @default(SCHEDULED)
+  teamSize     Int           @map("team_size")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  group        Group               @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  players      PeladaPlayer[]
-  queueEntries PeladaQueueEntry[]
+  pickupGame PickupGame @relation(fields: [pickupGameId], references: [id], onDelete: Cascade)
+
+  listEntries  DayListEntry[]
+  queueEntries QueueEntry[]
   matches      Match[]
 
-  @@index([groupId])
+  @@unique([pickupGameId, date])
   @@index([status])
   @@index([date])
-  @@map("peladas")
+  @@map("game_days")
 }
 
-model PeladaPlayer {
-  id            String             @id @default(uuid())
-  peladaId      String             @map("pelada_id")
-  groupMemberId String             @map("group_member_id")
-  status        PeladaPlayerStatus @default(ACTIVE)
+model DayListEntry {
+  id        String    @id @default(uuid())
+  gameDayId String    @map("game_day_id")
+  userId    String    @map("user_id")
+  joinedAt  DateTime  @default(now()) @map("joined_at")
+  removedAt DateTime? @map("removed_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  pelada      Pelada      @relation(fields: [peladaId], references: [id], onDelete: Cascade)
-  groupMember GroupMember @relation(fields: [groupMemberId], references: [id], onDelete: Restrict)
+  gameDay GameDay @relation(fields: [gameDayId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Restrict)
 
-  queueEntry   PeladaQueueEntry?
-  matchPlayers MatchPlayer[]
+  queueEntries QueueEntry[]
 
-  @@unique([peladaId, groupMemberId])
-  @@index([groupMemberId])
-  @@index([peladaId, status])
-  @@map("pelada_players")
+  @@index([gameDayId, userId])
+  @@index([userId])
+  @@index([removedAt])
+  @@map("day_list_entries")
 }
 
-model PeladaQueueEntry {
-  id             String @id @default(uuid())
-  peladaId        String @map("pelada_id")
-  peladaPlayerId  String @unique @map("pelada_player_id")
-  position        Int
+model QueueEntry {
+  id             String    @id @default(uuid())
+  gameDayId      String    @map("game_day_id")
+  userId         String    @map("user_id")
+  dayListEntryId String?   @map("day_list_entry_id")
+  arrivedAt      DateTime  @default(now()) @map("arrived_at")
+  currentPosition Int      @map("current_position")
+  removedAt      DateTime? @map("removed_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  pelada       Pelada       @relation(fields: [peladaId], references: [id], onDelete: Cascade)
-  peladaPlayer PeladaPlayer @relation(fields: [peladaPlayerId], references: [id], onDelete: Cascade)
+  gameDay      GameDay       @relation(fields: [gameDayId], references: [id], onDelete: Cascade)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Restrict)
+  dayListEntry DayListEntry? @relation(fields: [dayListEntryId], references: [id], onDelete: SetNull)
 
-  @@unique([peladaId, position])
-  @@index([peladaId])
-  @@map("pelada_queue_entries")
+  @@index([gameDayId, currentPosition])
+  @@index([gameDayId, userId])
+  @@index([userId])
+  @@index([removedAt])
+  @@map("queue_entries")
 }
 
 model Match {
-  id       String      @id @default(uuid())
-  peladaId String      @map("pelada_id")
-  sequence Int
-  status   MatchStatus @default(IN_PROGRESS)
-
-  startedAt  DateTime  @default(now()) @map("started_at")
-  finishedAt DateTime? @map("finished_at")
-  teamAScore Int?      @map("team_a_score")
-  teamBScore Int?      @map("team_b_score")
+  id        String      @id @default(uuid())
+  gameDayId String      @map("game_day_id")
+  number    Int
+  teamSize  Int         @map("team_size")
+  status    MatchStatus @default(RUNNING)
+  startedAt DateTime    @default(now()) @map("started_at")
+  endedAt   DateTime?   @map("ended_at")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  pelada  Pelada        @relation(fields: [peladaId], references: [id], onDelete: Cascade)
-  players MatchPlayer[]
+  gameDay GameDay @relation(fields: [gameDayId], references: [id], onDelete: Cascade)
 
-  @@unique([peladaId, sequence])
-  @@index([peladaId, status])
+  players MatchPlayer[]
+  goals   GoalEvent[]
+
+  @@unique([gameDayId, number])
+  @@index([gameDayId, status])
+  @@index([startedAt])
   @@map("matches")
 }
 
 model MatchPlayer {
-  id             String    @id @default(uuid())
-  matchId         String    @map("match_id")
-  peladaPlayerId  String    @map("pelada_player_id")
-  team            MatchTeam
+  id      String    @id @default(uuid())
+  matchId String    @map("match_id")
+  userId  String    @map("user_id")
+  side    MatchSide
+  slot    Int
 
   createdAt DateTime @default(now()) @map("created_at")
 
-  match        Match        @relation(fields: [matchId], references: [id], onDelete: Cascade)
-  peladaPlayer PeladaPlayer @relation(fields: [peladaPlayerId], references: [id], onDelete: Restrict)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
 
-  @@unique([matchId, peladaPlayerId])
-  @@index([matchId, team])
-  @@index([peladaPlayerId])
+  @@unique([matchId, userId])
+  @@unique([matchId, side, slot])
+  @@index([matchId, side])
+  @@index([userId])
   @@map("match_players")
+}
+
+model GoalEvent {
+  id             String    @id @default(uuid())
+  matchId        String    @map("match_id")
+  side           MatchSide
+  scorerUserId   String    @map("scorer_user_id")
+  assistUserId   String?   @map("assist_user_id")
+  minute         Int?
+  occurredAt     DateTime? @map("occurred_at")
+  createdByUserId String   @map("created_by_user_id")
+  updatedByUserId String?  @map("updated_by_user_id")
+  deletedAt      DateTime? @map("deleted_at")
+  deletedByUserId String?  @map("deleted_by_user_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  match     Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  scorer    User  @relation("GoalScorer", fields: [scorerUserId], references: [id], onDelete: Restrict)
+  assist    User? @relation("GoalAssistant", fields: [assistUserId], references: [id], onDelete: SetNull)
+  createdBy User  @relation("GoalCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
+  updatedBy User? @relation("GoalUpdater", fields: [updatedByUserId], references: [id], onDelete: SetNull)
+  deletedBy User? @relation("GoalDeleter", fields: [deletedByUserId], references: [id], onDelete: SetNull)
+
+  @@index([matchId, deletedAt])
+  @@index([scorerUserId])
+  @@index([assistUserId])
+  @@index([createdByUserId])
+  @@index([deletedAt])
+  @@map("goal_events")
 }
