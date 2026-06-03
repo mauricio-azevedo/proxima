@@ -1,5 +1,5 @@
 -- This migration intentionally replaces the previous group/pelada schema.
--- Existing users are preserved. Existing groups, peladas, queues, matches and match players are dropped.
+-- It preserves users when they already exist, but it can also recreate the full schema from an empty database.
 
 -- Drop old tables first, respecting dependencies.
 DROP TABLE IF EXISTS "match_players";
@@ -16,6 +16,29 @@ DROP TYPE IF EXISTS "PeladaStatus";
 DROP TYPE IF EXISTS "PeladaPlayerStatus";
 DROP TYPE IF EXISTS "MatchStatus";
 DROP TYPE IF EXISTS "MatchTeam";
+
+-- Base user enum/table. The old schema already had these, but a reset starts from an empty database.
+DO $$ BEGIN
+  CREATE TYPE "UserStatus" AS ENUM ('REGISTERED', 'PLACEHOLDER');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
+
+CREATE TABLE IF NOT EXISTS "users" (
+  "id" TEXT NOT NULL,
+  "first_name" TEXT,
+  "last_name" TEXT,
+  "nickname" TEXT NOT NULL,
+  "email" TEXT,
+  "password_hash" TEXT,
+  "status" "UserStatus" NOT NULL DEFAULT 'PLACEHOLDER',
+  "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  "updated_at" TIMESTAMP(3) NOT NULL,
+
+  CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS "users_email_key" ON "users"("email");
 
 -- New enum types.
 CREATE TYPE "Weekday" AS ENUM (
