@@ -1,8 +1,8 @@
-import { Avatar, Dropdown, Label, Tabs } from '@heroui/react';
+import { ArrowRightFromSquare, Gear, Person } from '@gravity-ui/icons';
+import { Avatar, Dropdown, Label, Separator, Tabs } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
-import { GearIcon, LogoutIcon } from '../icons/app-icons';
 
 interface AppShellProps {
   activeTab: AppTab;
@@ -52,35 +52,49 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
 
   return (
     <Dropdown>
-      <Dropdown.Trigger aria-label="Abrir menu do usuário">
+      <Dropdown.Trigger aria-label="Abrir menu do usuário" className="rounded-full">
         <Avatar>
-          <Avatar.Fallback>{initials}</Avatar.Fallback>
+          <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
         </Avatar>
       </Dropdown.Trigger>
 
       <Dropdown.Popover>
-        <div className="user-menu-header">
-          <Avatar size="sm">
-            <Avatar.Fallback>{initials}</Avatar.Fallback>
-          </Avatar>
-          <div>
-            <p>{user.name}</p>
-            <p>{user.email}</p>
+        <div className="px-3 pt-3 pb-1">
+          <div className="flex items-center gap-2">
+            <Avatar size="sm">
+              <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
+            </Avatar>
+
+            <div className="flex flex-col gap-0">
+              <p className="text-sm leading-5 font-medium">{user.name}</p>
+              <p className="text-xs leading-none text-muted">{user.email}</p>
+            </div>
           </div>
         </div>
 
         <Dropdown.Menu>
-          <Dropdown.Item id="settings" textValue="Configurações">
-            <div className="menu-item-row">
-              <Label>Configurações</Label>
-              <GearIcon className="menu-icon" />
+          <Dropdown.Item id="profile" textValue="Perfil">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Perfil</Label>
+              <Person className="size-3.5 text-muted" />
             </div>
           </Dropdown.Item>
 
+          <Dropdown.Item id="settings" textValue="Configurações">
+            <div className="flex w-full items-center justify-between gap-2">
+              <Label>Configurações</Label>
+              <Gear className="size-3.5 text-muted" />
+            </div>
+          </Dropdown.Item>
+        </Dropdown.Menu>
+
+        <Separator />
+
+        <Dropdown.Menu>
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="menu-item-row">
+            <div className="flex w-full items-center justify-between gap-2">
               <Label>Sair</Label>
-              <LogoutIcon className="menu-icon" />
+              <ArrowRightFromSquare className="size-3.5 text-danger" />
             </div>
           </Dropdown.Item>
         </Dropdown.Menu>
