@@ -1,0 +1,34 @@
+<article class="pickup-game-card">
+  <div class="card-topline">
+    <span class="status-pill" [class]="statusClass">{{ statusLabel }}</span>
+    <span class="role-pill">{{ isAdmin ? 'Admin' : isSaved ? 'Salva' : 'Aberta' }}</span>
+  </div>
+
+  <div class="card-main">
+    <h3>{{ pickupGame.name }}</h3>
+    <p class="location">{{ pickupGame.locationName || 'Local não informado' }}</p>
+  </div>
+
+  <div class="schedule-row">
+    <div>
+      <span>Dia</span>
+      <strong>{{ weekdayLabel }} · {{ pickupGame.startTime }}</strong>
+    </div>
+    <div>
+      <span>Próxima</span>
+      <strong>{{ formatDate(primaryDay?.date) }}</strong>
+    </div>
+    <div>
+      <span>Formato</span>
+      <strong>{{ primaryDay?.teamSize ?? pickupGame.defaultTeamSize }}x{{ primaryDay?.teamSize ?? pickupGame.defaultTeamSize }}</strong>
+    </div>
+  </div>
+
+  <div class="metrics-row">
+    <span>{{ playerCountLabel }}</span>
+    <span>{{ listCountLabel }}</span>
+    <span>{{ arrivalCountLabel }}</span>
+  </div>
+
+  <a class="card-action" [routerLink]="['/pickup-games', pickupGame.id]">Ver pelada</a>
+</article>
