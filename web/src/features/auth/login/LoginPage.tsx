@@ -1,4 +1,4 @@
-import { Button, Input, Label, TextField } from '@heroui/react';
+import { Button, Card, Form, Input, Label, Link, TextField, Typography } from '@heroui/react';
 
 import type { UserSession } from '../../../app/types/user-session';
 import { defaultUserSession } from '../constants/default-user-session';
@@ -23,33 +23,49 @@ export function LoginPage({ onLoggedIn, onRegisterRequested }: LoginPageProps) {
 
   return (
     <main className="auth-screen">
-      <form className="auth-form" onSubmit={submit}>
-        <h1>Login</h1>
+      <Card className="auth-card">
+        <Form aria-label="Login" className="auth-form" onSubmit={submit}>
+          <Card.Header>
+            <Typography.Heading level={1}>Login</Typography.Heading>
+          </Card.Header>
 
-        <TextField isRequired name="email" type="email">
-          <Label>Email</Label>
-          <Input fullWidth type="email" autoComplete="email" value={email.value} onChange={email.onChange} />
-        </TextField>
+          <Card.Content className="auth-fields">
+            <TextField fullWidth isRequired name="email" type="email">
+              <Label>Email</Label>
+              <Input
+                fullWidth
+                variant="secondary"
+                type="email"
+                autoComplete="email"
+                value={email.value}
+                onChange={email.onChange}
+              />
+            </TextField>
 
-        <TextField isRequired name="password" type="password">
-          <Label>Senha</Label>
-          <Input
-            fullWidth
-            type="password"
-            autoComplete="current-password"
-            value={password.value}
-            onChange={password.onChange}
-          />
-        </TextField>
+            <TextField fullWidth isRequired name="password" type="password">
+              <Label>Senha</Label>
+              <Input
+                fullWidth
+                variant="secondary"
+                type="password"
+                autoComplete="current-password"
+                value={password.value}
+                onChange={password.onChange}
+              />
+            </TextField>
+          </Card.Content>
 
-        <Button type="submit" variant="primary" fullWidth isDisabled={!email.value.trim() || !password.value.trim()}>
-          Entrar
-        </Button>
+          <Card.Footer className="auth-actions">
+            <Button type="submit" variant="primary" fullWidth isDisabled={!email.value.trim() || !password.value.trim()}>
+              Entrar
+            </Button>
 
-        <Button type="button" variant="tertiary" fullWidth onPress={onRegisterRequested}>
-          Criar conta
-        </Button>
-      </form>
+            <Typography.Paragraph size="sm" color="muted">
+              Não tem conta? <Link onPress={onRegisterRequested}>Criar conta</Link>
+            </Typography.Paragraph>
+          </Card.Footer>
+        </Form>
+      </Card>
     </main>
   );
 }
