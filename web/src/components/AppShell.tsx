@@ -62,9 +62,8 @@ function UserMenu({ user, onLogout }: { user: User; onLogout?: () => void }) {
               <GearIcon className="size-4 text-muted" />
             </div>
           </Dropdown.Item>
-          <Dropdown.Separator />
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex w-full items-center justify-between gap-3 border-t border-default-200 pt-2">
               <Label>Sair</Label>
               <LogoutIcon className="size-4 text-danger" />
             </div>
