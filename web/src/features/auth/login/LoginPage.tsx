@@ -1,6 +1,9 @@
-import { Button, Card, Form, Input, Label, Link, TextField, Typography } from '@heroui/react';
+import { Envelope } from '@gravity-ui/icons';
+import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
 import type { UserSession } from '../../../app/types/user-session';
+import { AuthPasswordInput } from '../components/AuthPasswordInput';
+import { AuthTextInput } from '../components/AuthTextInput';
 import { defaultUserSession } from '../constants/default-user-session';
 import { useAuthFormField } from '../hooks/use-auth-form-field';
 
@@ -30,29 +33,16 @@ export function LoginPage({ onLoggedIn, onRegisterRequested }: LoginPageProps) {
           </Card.Header>
 
           <Card.Content className="auth-fields">
-            <TextField fullWidth isRequired name="email" type="email">
-              <Label>Email</Label>
-              <Input
-                fullWidth
-                variant="secondary"
-                type="email"
-                autoComplete="email"
-                value={email.value}
-                onChange={email.onChange}
-              />
-            </TextField>
-
-            <TextField fullWidth isRequired name="password" type="password">
-              <Label>Senha</Label>
-              <Input
-                fullWidth
-                variant="secondary"
-                type="password"
-                autoComplete="current-password"
-                value={password.value}
-                onChange={password.onChange}
-              />
-            </TextField>
+            <AuthTextInput
+              autoComplete="email"
+              icon={Envelope}
+              label="Email"
+              name="email"
+              type="email"
+              value={email.value}
+              onChange={email.onChange}
+            />
+            <AuthPasswordInput autoComplete="current-password" value={password.value} onChange={password.onChange} />
           </Card.Content>
 
           <Card.Footer className="auth-actions">
