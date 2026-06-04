@@ -22,10 +22,12 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'groups/:groupId',
+    path: 'pickup-games/:pickupGameId',
     canActivate: [routeAuthGuard],
     loadComponent: () =>
-      import('./features/group-detail/group-detail.page').then((module) => module.GroupDetailPage),
+      import('./features/pickup-game-detail/pickup-game-detail.page').then(
+        (module) => module.PickupGameDetailPage,
+      ),
   },
   {
     path: '',
