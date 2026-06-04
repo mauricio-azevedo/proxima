@@ -5,14 +5,20 @@
   padding: 1rem;
 }
 
-.auth-form {
+.auth-card {
   width: min(100%, 24rem);
-  display: grid;
-  gap: 1rem;
 }
 
-.auth-form h1 {
-  margin: 0;
+.auth-form,
+.auth-fields,
+.auth-actions {
+  width: 100%;
+}
+
+.auth-fields,
+.auth-actions {
+  display: grid;
+  gap: 1rem;
 }
 
 .app-frame {
