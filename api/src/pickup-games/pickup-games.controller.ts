@@ -17,12 +17,16 @@ import type { CreatePickupGameDto } from './dto/create-pickup-game.dto';
 import type { FinishMatchDto } from './dto/finish-match.dto';
 import type { UpdateGameDayTeamSizeDto } from './dto/update-game-day-team-size.dto';
 import type { UpdateMatchGoalDto } from './dto/update-match-goal.dto';
+import { GameDaysService } from './game-days.service';
 import { PickupGamesService } from './pickup-games.service';
 
 @Controller('pickup-games')
 @UseGuards(AuthGuard)
 export class PickupGamesController {
-  constructor(private readonly pickupGamesService: PickupGamesService) {}
+  constructor(
+    private readonly pickupGamesService: PickupGamesService,
+    private readonly gameDaysService: GameDaysService,
+  ) {}
 
   @Get()
   findAll(@Req() request: AuthenticatedRequest) {
@@ -57,6 +61,16 @@ export class PickupGamesController {
   @Post(':pickupGameId/arrivals')
   arrive(@Req() request: AuthenticatedRequest, @Param('pickupGameId') pickupGameId: string) {
     return this.pickupGamesService.arrive(request.user.id, pickupGameId);
+  }
+
+  @Post(':pickupGameId/current-day/waiting-for-players')
+  startWaitingForPlayers(@Req() request: AuthenticatedRequest, @Param('pickupGameId') pickupGameId: string) {
+    return this.gameDaysService.startWaitingForPlayers(request.user.id, pickupGameId);
+  }
+
+  @Post(':pickupGameId/current-day/finish')
+  finishCurrentDay(@Req() request: AuthenticatedRequest, @Param('pickupGameId') pickupGameId: string) {
+    return this.gameDaysService.finishCurrentDay(request.user.id, pickupGameId);
   }
 
   @Patch(':pickupGameId/current-day/team-size')
