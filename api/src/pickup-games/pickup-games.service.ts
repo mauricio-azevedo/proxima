@@ -25,6 +25,12 @@ const MAX_PICKUP_GAME_NAME_LENGTH = 80;
 const MIN_TEAM_SIZE = 2;
 const MAX_TEAM_SIZE = 11;
 
+const OPEN_GAME_DAY_STATUSES = [
+  GameDayStatus.SCHEDULED,
+  GameDayStatus.WAITING_FOR_PLAYERS,
+  GameDayStatus.PLAYING,
+];
+
 const WEEKDAY_TO_UTC_DAY: Record<Weekday, number> = {
   MONDAY: 1,
   TUESDAY: 2,
@@ -35,6 +41,12 @@ const WEEKDAY_TO_UTC_DAY: Record<Weekday, number> = {
   SUNDAY: 0,
 };
 
+interface QueuePlayerSnapshot {
+  id?: string;
+  userId: string;
+  currentPosition: number;
+}
+
 @Injectable()
 export class PickupGamesService {
   constructor(private readonly prisma: PrismaService) {}
@@ -44,18 +56,16 @@ export class PickupGamesService {
     const weekday = this.parseWeekday(dto.weekday);
     const startTime = this.parseStartTime(dto.startTime);
     const defaultTeamSize = this.parseTeamSize(dto.defaultTeamSize, 'defaultTeamSize');
-    const locationName = this.parseOptionalText(dto.locationName);
-    const visibility = dto.visibility ?? PickupGameVisibility.PRIVATE;
 
     const pickupGame = await this.prisma.$transaction(async (transaction) => {
       const createdPickupGame = await transaction.pickupGame.create({
         data: {
           name,
-          locationName,
+          locationName: this.parseOptionalText(dto.locationName),
           weekday,
           startTime,
           defaultTeamSize,
-          visibility,
+          visibility: dto.visibility ?? PickupGameVisibility.PRIVATE,
           createdByUserId: userId,
         },
         select: { id: true },
@@ -92,13 +102,7 @@ export class PickupGamesService {
 
   async findAll(userId: string) {
     return this.prisma.pickupGame.findMany({
-      where: {
-        OR: [
-          { visibility: PickupGameVisibility.PUBLIC },
-          { users: { some: { userId } } },
-          { admins: { some: { userId } } },
-        ],
-      },
+      where: this.visiblePickupGameWhere(userId),
       orderBy: { createdAt: 'desc' },
       select: this.pickupGameListSelect(userId),
     });
@@ -124,16 +128,8 @@ export class PickupGamesService {
     await this.ensureVisible(userId, pickupGameId);
 
     await this.prisma.pickupGameUser.upsert({
-      where: {
-        pickupGameId_userId: {
-          pickupGameId,
-          userId,
-        },
-      },
-      create: {
-        pickupGameId,
-        userId,
-      },
+      where: { pickupGameId_userId: { pickupGameId, userId } },
+      create: { pickupGameId, userId },
       update: {},
     });
 
@@ -142,19 +138,12 @@ export class PickupGamesService {
 
   async unsave(userId: string, pickupGameId: string) {
     const savedPickupGame = await this.prisma.pickupGameUser.findUnique({
-      where: {
-        pickupGameId_userId: {
-          pickupGameId,
-          userId,
-        },
-      },
+      where: { pickupGameId_userId: { pickupGameId, userId } },
       select: { id: true },
     });
 
     if (savedPickupGame) {
-      await this.prisma.pickupGameUser.delete({
-        where: { id: savedPickupGame.id },
-      });
+      await this.prisma.pickupGameUser.delete({ where: { id: savedPickupGame.id } });
     }
 
     return { id: pickupGameId };
@@ -164,30 +153,14 @@ export class PickupGamesService {
     await this.ensureVisible(userId, pickupGameId);
     const gameDay = await this.ensurePrimaryGameDay(pickupGameId);
 
-    await this.prisma.dayListEntry.upsert({
-      where: {
-        // Prisma cannot model the partial unique index. This compound key only works if there is no removed entry.
-        // We use a lookup first to avoid depending on a generated compound unique accessor.
-        id: await this.findActiveDayListEntryId(gameDay.id, userId),
-      },
-      create: {
-        gameDayId: gameDay.id,
-        userId,
-      },
-      update: {},
-    }).catch(async () => {
-      const existing = await this.findActiveDayListEntryId(gameDay.id, userId);
-      if (existing) {
-        return;
-      }
-
-      await this.prisma.dayListEntry.create({
-        data: {
-          gameDayId: gameDay.id,
-          userId,
-        },
-      });
+    const existingEntry = await this.prisma.dayListEntry.findFirst({
+      where: { gameDayId: gameDay.id, userId, removedAt: null },
+      select: { id: true },
     });
+
+    if (!existingEntry) {
+      await this.prisma.dayListEntry.create({ data: { gameDayId: gameDay.id, userId } });
+    }
 
     return this.findOne(userId, pickupGameId);
   }
@@ -196,55 +169,39 @@ export class PickupGamesService {
     await this.ensureVisible(userId, pickupGameId);
     const gameDay = await this.ensurePrimaryGameDay(pickupGameId);
 
-    const queueEntry = await this.prisma.queueEntry.findFirst({
-      where: {
-        gameDayId: gameDay.id,
-        userId,
-        removedAt: null,
-      },
+    const existingQueueEntry = await this.prisma.queueEntry.findFirst({
+      where: { gameDayId: gameDay.id, userId, removedAt: null },
       select: { id: true },
     });
 
-    if (queueEntry) {
+    if (existingQueueEntry) {
       return this.findOne(userId, pickupGameId);
     }
 
     await this.prisma.$transaction(async (transaction) => {
-      const listEntry = await transaction.dayListEntry.findFirst({
-        where: {
-          gameDayId: gameDay.id,
-          userId,
-          removedAt: null,
-        },
+      const existingListEntry = await transaction.dayListEntry.findFirst({
+        where: { gameDayId: gameDay.id, userId, removedAt: null },
         select: { id: true },
       });
 
-      const activeListEntry = listEntry ?? await transaction.dayListEntry.create({
-        data: {
-          gameDayId: gameDay.id,
-          userId,
-        },
-        select: { id: true },
-      });
+      const listEntry =
+        existingListEntry ??
+        (await transaction.dayListEntry.create({
+          data: { gameDayId: gameDay.id, userId },
+          select: { id: true },
+        }));
 
       const lastQueueEntry = await transaction.queueEntry.findFirst({
-        where: {
-          gameDayId: gameDay.id,
-          removedAt: null,
-        },
-        orderBy: {
-          currentPosition: 'desc',
-        },
-        select: {
-          currentPosition: true,
-        },
+        where: { gameDayId: gameDay.id, removedAt: null },
+        orderBy: { currentPosition: 'desc' },
+        select: { currentPosition: true },
       });
 
       await transaction.queueEntry.create({
         data: {
           gameDayId: gameDay.id,
           userId,
-          dayListEntryId: activeListEntry.id,
+          dayListEntryId: listEntry.id,
           currentPosition: (lastQueueEntry?.currentPosition ?? 0) + 1,
         },
       });
@@ -262,10 +219,7 @@ export class PickupGamesService {
       throw new BadRequestException('Cannot update a closed game day.');
     }
 
-    await this.prisma.gameDay.update({
-      where: { id: gameDay.id },
-      data: { teamSize },
-    });
+    await this.prisma.gameDay.update({ where: { id: gameDay.id }, data: { teamSize } });
 
     return this.findOne(userId, pickupGameId);
   }
@@ -279,24 +233,13 @@ export class PickupGamesService {
     }
 
     await this.prisma.$transaction(async (transaction) => {
-      const activeQueueEntries = await transaction.queueEntry.findMany({
-        where: {
-          gameDayId: gameDay.id,
-          removedAt: null,
-        },
-        orderBy: { currentPosition: 'asc' },
-        select: {
-          userId: true,
-          currentPosition: true,
-        },
-      });
+      const queueEntries = await this.getActiveQueueEntries(transaction, gameDay.id);
 
-      if (activeQueueEntries.length < gameDay.teamSize * 2) {
+      if (queueEntries.length < gameDay.teamSize * 2) {
         throw new BadRequestException('Not enough players to start the first match.');
       }
 
-      await this.createMatchFromQueue(transaction, gameDay.id, gameDay.teamSize, 1, activeQueueEntries);
-
+      await this.createMatchFromQueue(transaction, gameDay.id, gameDay.teamSize, 1, queueEntries);
       await transaction.gameDay.update({
         where: { id: gameDay.id },
         data: { status: GameDayStatus.PLAYING },
@@ -309,6 +252,10 @@ export class PickupGamesService {
   async addGoal(userId: string, matchId: string, dto: CreateMatchGoalDto) {
     const match = await this.getMatchForAccess(matchId);
     await this.ensureAdmin(userId, match.gameDay.pickupGameId);
+
+    if (match.status !== MatchStatus.RUNNING) {
+      throw new BadRequestException('Cannot add goals to a finished match.');
+    }
 
     const side = this.parseSide(dto.side);
     const scorerUserId = this.parseRequiredId(dto.scorerUserId, 'scorerUserId');
@@ -338,15 +285,7 @@ export class PickupGamesService {
         scorerUserId: true,
         assistUserId: true,
         deletedAt: true,
-        match: {
-          select: {
-            gameDay: {
-              select: {
-                pickupGameId: true,
-              },
-            },
-          },
-        },
+        match: { select: { gameDay: { select: { pickupGameId: true } } } },
       },
     });
 
@@ -378,15 +317,7 @@ export class PickupGamesService {
       select: {
         id: true,
         deletedAt: true,
-        match: {
-          select: {
-            gameDay: {
-              select: {
-                pickupGameId: true,
-              },
-            },
-          },
-        },
+        match: { select: { gameDay: { select: { pickupGameId: true } } } },
       },
     });
 
@@ -398,10 +329,7 @@ export class PickupGamesService {
 
     await this.prisma.goalEvent.update({
       where: { id: goalId },
-      data: {
-        deletedAt: new Date(),
-        deletedByUserId: userId,
-      },
+      data: { deletedAt: new Date(), deletedByUserId: userId },
     });
 
     return { id: goalId };
@@ -420,17 +348,11 @@ export class PickupGamesService {
     await this.prisma.$transaction(async (transaction) => {
       await transaction.match.update({
         where: { id: matchId },
-        data: {
-          status: MatchStatus.FINISHED,
-          endedAt: new Date(),
-        },
+        data: { status: MatchStatus.FINISHED, endedAt: new Date() },
       });
 
       const loserPlayers = await transaction.matchPlayer.findMany({
-        where: {
-          matchId,
-          side: loserSide,
-        },
+        where: { matchId, side: loserSide },
         select: { userId: true },
       });
 
@@ -440,25 +362,15 @@ export class PickupGamesService {
         loserPlayers.map((player) => player.userId),
       );
 
-      const activeQueueEntries = await transaction.queueEntry.findMany({
-        where: {
-          gameDayId: match.gameDay.id,
-          removedAt: null,
-        },
-        orderBy: { currentPosition: 'asc' },
-        select: {
-          userId: true,
-          currentPosition: true,
-        },
-      });
+      const queueEntries = await this.getActiveQueueEntries(transaction, match.gameDay.id);
 
-      if (activeQueueEntries.length >= match.gameDay.teamSize * 2) {
+      if (queueEntries.length >= match.gameDay.teamSize * 2) {
         await this.createMatchFromQueue(
           transaction,
           match.gameDay.id,
           match.gameDay.teamSize,
           match.number + 1,
-          activeQueueEntries,
+          queueEntries,
         );
       }
     });
@@ -466,16 +378,19 @@ export class PickupGamesService {
     return this.findOne(userId, match.gameDay.pickupGameId);
   }
 
+  private visiblePickupGameWhere(userId: string) {
+    return {
+      OR: [
+        { visibility: PickupGameVisibility.PUBLIC },
+        { users: { some: { userId } } },
+        { admins: { some: { userId } } },
+      ],
+    } as const;
+  }
+
   private async ensureVisible(userId: string, pickupGameId: string): Promise<void> {
     const pickupGame = await this.prisma.pickupGame.findFirst({
-      where: {
-        id: pickupGameId,
-        OR: [
-          { visibility: PickupGameVisibility.PUBLIC },
-          { users: { some: { userId } } },
-          { admins: { some: { userId } } },
-        ],
-      },
+      where: { id: pickupGameId, ...this.visiblePickupGameWhere(userId) },
       select: { id: true },
     });
 
@@ -486,12 +401,7 @@ export class PickupGamesService {
 
   private async ensureAdmin(userId: string, pickupGameId: string): Promise<void> {
     const admin = await this.prisma.pickupGameAdmin.findUnique({
-      where: {
-        pickupGameId_userId: {
-          pickupGameId,
-          userId,
-        },
-      },
+      where: { pickupGameId_userId: { pickupGameId, userId } },
       select: { id: true },
     });
 
@@ -503,28 +413,18 @@ export class PickupGamesService {
   private async ensurePrimaryGameDay(pickupGameId: string) {
     const pickupGame = await this.prisma.pickupGame.findUnique({
       where: { id: pickupGameId },
-      select: {
-        id: true,
-        weekday: true,
-        defaultTeamSize: true,
-      },
+      select: { id: true, weekday: true, defaultTeamSize: true },
     });
 
     if (!pickupGame) {
       throw new NotFoundException('Pickup game not found.');
     }
 
-    const today = this.todayUtcDate();
-
     const existingGameDay = await this.prisma.gameDay.findFirst({
       where: {
         pickupGameId,
-        status: {
-          in: [GameDayStatus.SCHEDULED, GameDayStatus.WAITING_FOR_PLAYERS, GameDayStatus.PLAYING],
-        },
-        date: {
-          gte: today,
-        },
+        status: { in: OPEN_GAME_DAY_STATUSES },
+        date: { gte: this.todayUtcDate() },
       },
       orderBy: { date: 'asc' },
     });
@@ -542,19 +442,6 @@ export class PickupGamesService {
     });
   }
 
-  private async findActiveDayListEntryId(gameDayId: string, userId: string): Promise<string> {
-    const entry = await this.prisma.dayListEntry.findFirst({
-      where: {
-        gameDayId,
-        userId,
-        removedAt: null,
-      },
-      select: { id: true },
-    });
-
-    return entry?.id ?? '00000000-0000-0000-0000-000000000000';
-  }
-
   private async getMatchForAccess(matchId: string) {
     const match = await this.prisma.match.findUnique({
       where: { id: matchId },
@@ -562,17 +449,8 @@ export class PickupGamesService {
         id: true,
         number: true,
         status: true,
-        gameDay: {
-          select: {
-            id: true,
-            pickupGameId: true,
-            teamSize: true,
-          },
-        },
-        goals: {
-          where: { deletedAt: null },
-          select: { side: true },
-        },
+        gameDay: { select: { id: true, pickupGameId: true, teamSize: true } },
+        goals: { where: { deletedAt: null }, select: { side: true } },
       },
     });
 
@@ -581,6 +459,14 @@ export class PickupGamesService {
     }
 
     return match;
+  }
+
+  private async getActiveQueueEntries(transaction: any, gameDayId: string): Promise<QueuePlayerSnapshot[]> {
+    return transaction.queueEntry.findMany({
+      where: { gameDayId, removedAt: null },
+      orderBy: { currentPosition: 'asc' },
+      select: { id: true, userId: true, currentPosition: true },
+    });
   }
 
   private async ensureGoalPlayersAreValid(
@@ -614,14 +500,10 @@ export class PickupGamesService {
     gameDayId: string,
     teamSize: number,
     number: number,
-    queueEntries: Array<{ userId: string; currentPosition: number }>,
+    queueEntries: QueuePlayerSnapshot[],
   ) {
     const match = await transaction.match.create({
-      data: {
-        gameDayId,
-        number,
-        teamSize,
-      },
+      data: { gameDayId, number, teamSize },
       select: { id: true },
     });
 
@@ -630,42 +512,17 @@ export class PickupGamesService {
 
     await transaction.matchPlayer.createMany({
       data: [
-        ...teamA.map((entry, index) => ({
-          matchId: match.id,
-          userId: entry.userId,
-          side: MatchSide.A,
-          slot: index + 1,
-        })),
-        ...teamB.map((entry, index) => ({
-          matchId: match.id,
-          userId: entry.userId,
-          side: MatchSide.B,
-          slot: index + 1,
-        })),
+        ...teamA.map((entry, index) => ({ matchId: match.id, userId: entry.userId, side: MatchSide.A, slot: index + 1 })),
+        ...teamB.map((entry, index) => ({ matchId: match.id, userId: entry.userId, side: MatchSide.B, slot: index + 1 })),
       ],
     });
 
     return match;
   }
 
-  private async rotateLosingPlayersToEnd(
-    transaction: any,
-    gameDayId: string,
-    losingUserIds: string[],
-  ) {
+  private async rotateLosingPlayersToEnd(transaction: any, gameDayId: string, losingUserIds: string[]) {
     const losingUserIdSet = new Set(losingUserIds);
-
-    const activeQueueEntries = await transaction.queueEntry.findMany({
-      where: {
-        gameDayId,
-        removedAt: null,
-      },
-      orderBy: { currentPosition: 'asc' },
-      select: {
-        id: true,
-        userId: true,
-      },
-    });
+    const activeQueueEntries = await this.getActiveQueueEntries(transaction, gameDayId);
 
     const reorderedEntries = [
       ...activeQueueEntries.filter((entry) => !losingUserIdSet.has(entry.userId)),
@@ -706,15 +563,11 @@ export class PickupGamesService {
     }
 
     if (normalizedName.length < MIN_PICKUP_GAME_NAME_LENGTH) {
-      throw new BadRequestException(
-        `Pickup game name must have at least ${MIN_PICKUP_GAME_NAME_LENGTH} characters.`,
-      );
+      throw new BadRequestException(`Pickup game name must have at least ${MIN_PICKUP_GAME_NAME_LENGTH} characters.`);
     }
 
     if (normalizedName.length > MAX_PICKUP_GAME_NAME_LENGTH) {
-      throw new BadRequestException(
-        `Pickup game name must have at most ${MAX_PICKUP_GAME_NAME_LENGTH} characters.`,
-      );
+      throw new BadRequestException(`Pickup game name must have at most ${MAX_PICKUP_GAME_NAME_LENGTH} characters.`);
     }
 
     return normalizedName;
@@ -795,11 +648,7 @@ export class PickupGamesService {
     const targetDay = WEEKDAY_TO_UTC_DAY[weekday];
     const daysUntilTarget = (targetDay - currentDay + 7) % 7;
 
-    return new Date(Date.UTC(
-      today.getUTCFullYear(),
-      today.getUTCMonth(),
-      today.getUTCDate() + daysUntilTarget,
-    ));
+    return new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysUntilTarget));
   }
 
   private todayUtcDate(): Date {
@@ -818,22 +667,10 @@ export class PickupGamesService {
       visibility: true,
       createdAt: true,
       updatedAt: true,
-      users: {
-        where: { userId },
-        select: { id: true },
-        take: 1,
-      },
-      admins: {
-        where: { userId },
-        select: { id: true, role: true },
-        take: 1,
-      },
+      users: { where: { userId }, select: { id: true }, take: 1 },
+      admins: { where: { userId }, select: { id: true, role: true }, take: 1 },
       days: {
-        where: {
-          status: {
-            in: [GameDayStatus.SCHEDULED, GameDayStatus.WAITING_FOR_PLAYERS, GameDayStatus.PLAYING],
-          },
-        },
+        where: { status: { in: OPEN_GAME_DAY_STATUSES } },
         orderBy: { date: 'asc' },
         take: 1,
         select: {
@@ -841,19 +678,10 @@ export class PickupGamesService {
           date: true,
           status: true,
           teamSize: true,
-          _count: {
-            select: {
-              listEntries: { where: { removedAt: null } },
-              queueEntries: { where: { removedAt: null } },
-            },
-          },
+          _count: { select: { listEntries: { where: { removedAt: null } }, queueEntries: { where: { removedAt: null } } } },
         },
       },
-      _count: {
-        select: {
-          users: true,
-        },
-      },
+      _count: { select: { users: true } },
     } as const;
   }
 
@@ -868,22 +696,10 @@ export class PickupGamesService {
       visibility: true,
       createdAt: true,
       updatedAt: true,
-      users: {
-        where: { userId },
-        select: { id: true },
-        take: 1,
-      },
-      admins: {
-        where: { userId },
-        select: { id: true, role: true },
-        take: 1,
-      },
+      users: { where: { userId }, select: { id: true }, take: 1 },
+      admins: { where: { userId }, select: { id: true, role: true }, take: 1 },
       days: {
-        where: {
-          status: {
-            in: [GameDayStatus.SCHEDULED, GameDayStatus.WAITING_FOR_PLAYERS, GameDayStatus.PLAYING],
-          },
-        },
+        where: { status: { in: OPEN_GAME_DAY_STATUSES } },
         orderBy: { date: 'asc' },
         take: 1,
         select: {
@@ -894,21 +710,12 @@ export class PickupGamesService {
           listEntries: {
             where: { removedAt: null },
             orderBy: { joinedAt: 'asc' },
-            select: {
-              id: true,
-              joinedAt: true,
-              user: { select: this.userSelect() },
-            },
+            select: { id: true, joinedAt: true, user: { select: this.userSelect() } },
           },
           queueEntries: {
             where: { removedAt: null },
             orderBy: { currentPosition: 'asc' },
-            select: {
-              id: true,
-              arrivedAt: true,
-              currentPosition: true,
-              user: { select: this.userSelect() },
-            },
+            select: { id: true, arrivedAt: true, currentPosition: true, user: { select: this.userSelect() } },
           },
           matches: {
             orderBy: { number: 'desc' },
@@ -922,12 +729,7 @@ export class PickupGamesService {
               endedAt: true,
               players: {
                 orderBy: [{ side: 'asc' }, { slot: 'asc' }],
-                select: {
-                  id: true,
-                  side: true,
-                  slot: true,
-                  user: { select: this.userSelect() },
-                },
+                select: { id: true, side: true, slot: true, user: { select: this.userSelect() } },
               },
               goals: {
                 where: { deletedAt: null },
@@ -947,11 +749,7 @@ export class PickupGamesService {
           },
         },
       },
-      _count: {
-        select: {
-          users: true,
-        },
-      },
+      _count: { select: { users: true } },
     } as const;
   }
 
