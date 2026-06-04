@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Avatar, Button, Dropdown, Input, Label, TextField } from '@heroui/react';
+import { Avatar, Button, Dropdown, Input, Label, Tab, Tabs, TextField } from '@heroui/react';
 import './App.css';
 
 type Screen = 'login' | 'register' | 'home' | 'search' | 'profile';
+type AppTab = Extract<Screen, 'home' | 'search' | 'profile'>;
 
 interface UserSession {
   name: string;
@@ -36,7 +37,7 @@ function App() {
     return <LoginScreen onRegisterRequested={() => setScreen('register')} onLoggedIn={completeAuth} />;
   }
 
-  return <AppShell activeScreen={screen} user={user} onScreenChange={setScreen} onLogout={logout} />;
+  return <AppShell activeTab={screen as AppTab} user={user} onTabChange={setScreen} onLogout={logout} />;
 }
 
 interface LoginScreenProps {
@@ -50,65 +51,44 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onLoggedIn({
-      name: defaultUser.name,
-      email: email.trim() || defaultUser.email,
-    });
+    onLoggedIn({ name: defaultUser.name, email: email.trim() || defaultUser.email });
   }
 
   return (
     <main className="auth-screen">
-      <section className="auth-panel" aria-labelledby="login-title">
-        <div className="auth-copy">
-          <p className="eyebrow">Próxima</p>
-          <h1 id="login-title">Entre para organizar sua pelada.</h1>
-          <p>Lista, chegada, fila e partidas em um fluxo simples para a quadra.</p>
-        </div>
+      <form className="auth-form" onSubmit={submit}>
+        <h1>Login</h1>
 
-        <section className="auth-card" aria-label="Formulário de login">
-          <form className="auth-form" onSubmit={submit}>
-            <div className="form-heading">
-              <h2>Login</h2>
-              <p>Acesse sua conta para continuar.</p>
-            </div>
+        <TextField isRequired name="email" type="email">
+          <Label>Email</Label>
+          <Input
+            fullWidth
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </TextField>
 
-            <TextField isRequired className="field" name="email" type="email">
-              <Label>Email</Label>
-              <Input
-                fullWidth
-                type="email"
-                autoComplete="email"
-                placeholder="voce@email.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </TextField>
+        <TextField isRequired name="password" type="password">
+          <Label>Senha</Label>
+          <Input
+            fullWidth
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </TextField>
 
-            <TextField isRequired className="field" name="password" type="password">
-              <Label>Senha</Label>
-              <Input
-                fullWidth
-                type="password"
-                autoComplete="current-password"
-                placeholder="Sua senha"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </TextField>
+        <Button type="submit" variant="primary" fullWidth isDisabled={!email.trim() || !password.trim()}>
+          Entrar
+        </Button>
 
-            <Button type="submit" variant="primary" fullWidth isDisabled={!password.trim()}>
-              Entrar
-            </Button>
-
-            <p className="auth-switch">
-              Não tem conta?{' '}
-              <button type="button" onClick={onRegisterRequested}>
-                Criar conta
-              </button>
-            </p>
-          </form>
-        </section>
-      </section>
+        <Button type="button" variant="tertiary" fullWidth onPress={onRegisterRequested}>
+          Criar conta
+        </Button>
+      </form>
     </main>
   );
 }
@@ -125,98 +105,71 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
 
   function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    onRegistered({
-      name: name.trim() || defaultUser.name,
-      email: email.trim() || defaultUser.email,
-    });
+    onRegistered({ name: name.trim() || defaultUser.name, email: email.trim() || defaultUser.email });
   }
 
   return (
     <main className="auth-screen">
-      <section className="auth-panel" aria-labelledby="register-title">
-        <div className="auth-copy">
-          <p className="eyebrow">Próxima</p>
-          <h1 id="register-title">Crie sua conta.</h1>
-          <p>Comece com uma conta simples. O restante da pelada vem depois.</p>
-        </div>
+      <form className="auth-form" onSubmit={submit}>
+        <h1>Cadastro</h1>
 
-        <section className="auth-card" aria-label="Formulário de cadastro">
-          <form className="auth-form" onSubmit={submit}>
-            <div className="form-heading">
-              <h2>Cadastro</h2>
-              <p>Use nome, email e senha para criar sua conta.</p>
-            </div>
+        <TextField isRequired name="name">
+          <Label>Nome</Label>
+          <Input fullWidth autoComplete="name" value={name} onChange={(event) => setName(event.target.value)} />
+        </TextField>
 
-            <TextField isRequired className="field" name="name">
-              <Label>Nome</Label>
-              <Input
-                fullWidth
-                autoComplete="name"
-                placeholder="Seu nome"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-              />
-            </TextField>
+        <TextField isRequired name="email" type="email">
+          <Label>Email</Label>
+          <Input
+            fullWidth
+            type="email"
+            autoComplete="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+        </TextField>
 
-            <TextField isRequired className="field" name="email" type="email">
-              <Label>Email</Label>
-              <Input
-                fullWidth
-                type="email"
-                autoComplete="email"
-                placeholder="voce@email.com"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </TextField>
+        <TextField isRequired name="password" type="password">
+          <Label>Senha</Label>
+          <Input
+            fullWidth
+            type="password"
+            autoComplete="new-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+          />
+        </TextField>
 
-            <TextField isRequired className="field" name="password" type="password">
-              <Label>Senha</Label>
-              <Input
-                fullWidth
-                type="password"
-                autoComplete="new-password"
-                placeholder="Crie uma senha"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </TextField>
+        <Button
+          type="submit"
+          variant="primary"
+          fullWidth
+          isDisabled={!name.trim() || !email.trim() || !password.trim()}
+        >
+          Criar conta
+        </Button>
 
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              isDisabled={!name.trim() || !email.trim() || !password.trim()}
-            >
-              Criar conta
-            </Button>
-
-            <p className="auth-switch">
-              Já tem conta?{' '}
-              <button type="button" onClick={onLoginRequested}>
-                Entrar
-              </button>
-            </p>
-          </form>
-        </section>
-      </section>
+        <Button type="button" variant="tertiary" fullWidth onPress={onLoginRequested}>
+          Entrar
+        </Button>
+      </form>
     </main>
   );
 }
 
 interface AppShellProps {
-  activeScreen: Screen;
+  activeTab: AppTab;
   user: UserSession;
-  onScreenChange: (screen: Screen) => void;
+  onTabChange: (screen: AppTab) => void;
   onLogout: () => void;
 }
 
-function AppShell({ activeScreen, user, onScreenChange, onLogout }: AppShellProps) {
+function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellProps) {
   const title = useMemo(() => {
-    if (activeScreen === 'search') return 'Buscar';
-    if (activeScreen === 'profile') return 'Perfil';
+    if (activeTab === 'search') return 'Buscar';
+    if (activeTab === 'profile') return 'Perfil';
     return 'Início';
-  }, [activeScreen]);
+  }, [activeTab]);
 
   return (
     <main className="app-frame">
@@ -225,15 +178,19 @@ function AppShell({ activeScreen, user, onScreenChange, onLogout }: AppShellProp
         <UserMenu user={user} onLogout={onLogout} />
       </header>
 
-      <section className="empty-content" aria-labelledby="empty-title">
-        <div>
-          <p className="eyebrow">Conteúdo</p>
-          <h2 id="empty-title">Tela vazia por enquanto.</h2>
-          <p>O layout base já está pronto para receber os próximos módulos.</p>
-        </div>
-      </section>
+      <section className="app-content" />
 
-      <Dock activeScreen={activeScreen} onScreenChange={onScreenChange} />
+      <nav className="app-dock" aria-label="Navegação principal">
+        <Tabs
+          aria-label="Navegação principal"
+          selectedKey={activeTab}
+          onSelectionChange={(key) => onTabChange(key as AppTab)}
+        >
+          <Tab key="home" title={<HomeIcon />} />
+          <Tab key="search" title={<SearchIcon />} />
+          <Tab key="profile" title={<UserIcon />} />
+        </Tabs>
+      </nav>
     </main>
   );
 }
@@ -248,20 +205,20 @@ function UserMenu({ user, onLogout }: UserMenuProps) {
 
   return (
     <Dropdown>
-      <Dropdown.Trigger className="avatar-trigger" aria-label="Abrir menu do usuário">
+      <Dropdown.Trigger aria-label="Abrir menu do usuário">
         <Avatar>
           <Avatar.Fallback>{initials}</Avatar.Fallback>
         </Avatar>
       </Dropdown.Trigger>
 
-      <Dropdown.Popover className="user-popover">
-        <div className="user-card-header">
+      <Dropdown.Popover>
+        <div className="user-menu-header">
           <Avatar size="sm">
             <Avatar.Fallback>{initials}</Avatar.Fallback>
           </Avatar>
           <div>
-            <p className="user-name">{user.name}</p>
-            <p className="user-email">{user.email}</p>
+            <p>{user.name}</p>
+            <p>{user.email}</p>
           </div>
         </div>
 
@@ -274,7 +231,7 @@ function UserMenu({ user, onLogout }: UserMenuProps) {
           </Dropdown.Item>
 
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="menu-item-row danger separated">
+            <div className="menu-item-row">
               <Label>Sair</Label>
               <LogoutIcon />
             </div>
@@ -282,48 +239,6 @@ function UserMenu({ user, onLogout }: UserMenuProps) {
         </Dropdown.Menu>
       </Dropdown.Popover>
     </Dropdown>
-  );
-}
-
-interface DockProps {
-  activeScreen: Screen;
-  onScreenChange: (screen: Screen) => void;
-}
-
-function Dock({ activeScreen, onScreenChange }: DockProps) {
-  return (
-    <nav className="dock" aria-label="Navegação principal">
-      <DockButton label="Início" isActive={activeScreen === 'home'} onClick={() => onScreenChange('home')}>
-        <HomeIcon />
-      </DockButton>
-      <DockButton label="Buscar" isActive={activeScreen === 'search'} onClick={() => onScreenChange('search')}>
-        <SearchIcon />
-      </DockButton>
-      <DockButton label="Perfil" isActive={activeScreen === 'profile'} onClick={() => onScreenChange('profile')}>
-        <UserIcon />
-      </DockButton>
-    </nav>
-  );
-}
-
-interface DockButtonProps {
-  label: string;
-  isActive: boolean;
-  onClick: () => void;
-  children: React.ReactNode;
-}
-
-function DockButton({ label, isActive, onClick, children }: DockButtonProps) {
-  return (
-    <button
-      type="button"
-      className={isActive ? 'dock-button active' : 'dock-button'}
-      aria-label={label}
-      aria-current={isActive ? 'page' : undefined}
-      onClick={onClick}
-    >
-      {children}
-    </button>
   );
 }
 
@@ -336,7 +251,7 @@ function getInitials(name: string): string {
 
 function HomeIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M3.8 10.9 12 4l8.2 6.9v8.3a1.8 1.8 0 0 1-1.8 1.8h-3.2v-6.1H8.8V21H5.6a1.8 1.8 0 0 1-1.8-1.8z" />
     </svg>
   );
@@ -344,7 +259,7 @@ function HomeIcon() {
 
 function SearchIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M10.8 4.2a6.6 6.6 0 1 0 4.2 11.7l3.6 3.6a1.1 1.1 0 0 0 1.5-1.5l-3.6-3.6A6.6 6.6 0 0 0 10.8 4.2Zm0 2.2a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8Z" />
     </svg>
   );
@@ -352,7 +267,7 @@ function SearchIcon() {
 
 function UserIcon() {
   return (
-    <svg viewBox="0 0 24 24" aria-hidden="true">
+    <svg className="icon" viewBox="0 0 24 24" aria-hidden="true">
       <path d="M12 12.2a4.1 4.1 0 1 0 0-8.2 4.1 4.1 0 0 0 0 8.2Zm0 2.1c-4.7 0-7.7 2.4-7.7 5.2 0 .8.6 1.5 1.5 1.5h12.4c.9 0 1.5-.7 1.5-1.5 0-2.8-3-5.2-7.7-5.2Z" />
     </svg>
   );
