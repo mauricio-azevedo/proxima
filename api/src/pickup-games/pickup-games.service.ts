@@ -13,6 +13,7 @@ import {
   PickupGameVisibility,
   Weekday,
 } from '../../generated/prisma';
+import type { Prisma } from '../../generated/prisma';
 import { PrismaService } from '../database/prisma.service';
 import { CreateMatchGoalDto } from './dto/create-match-goal.dto';
 import { CreatePickupGameDto } from './dto/create-pickup-game.dto';
@@ -25,7 +26,7 @@ const MAX_PICKUP_GAME_NAME_LENGTH = 80;
 const MIN_TEAM_SIZE = 2;
 const MAX_TEAM_SIZE = 11;
 
-const OPEN_GAME_DAY_STATUSES = [
+const OPEN_GAME_DAY_STATUSES: GameDayStatus[] = [
   GameDayStatus.SCHEDULED,
   GameDayStatus.WAITING_FOR_PLAYERS,
   GameDayStatus.PLAYING,
@@ -378,14 +379,14 @@ export class PickupGamesService {
     return this.findOne(userId, match.gameDay.pickupGameId);
   }
 
-  private visiblePickupGameWhere(userId: string) {
+  private visiblePickupGameWhere(userId: string): Prisma.PickupGameWhereInput {
     return {
       OR: [
         { visibility: PickupGameVisibility.PUBLIC },
         { users: { some: { userId } } },
         { admins: { some: { userId } } },
       ],
-    } as const;
+    };
   }
 
   private async ensureVisible(userId: string, pickupGameId: string): Promise<void> {
@@ -592,7 +593,7 @@ export class PickupGamesService {
   }
 
   private parseTeamSize(teamSize: number | undefined, fieldName: string): number {
-    if (!Number.isInteger(teamSize)) {
+    if (teamSize === undefined || !Number.isInteger(teamSize)) {
       throw new BadRequestException(`${fieldName} must be an integer.`);
     }
 
@@ -656,7 +657,7 @@ export class PickupGamesService {
     return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   }
 
-  private pickupGameListSelect(userId: string) {
+  private pickupGameListSelect(userId: string): Prisma.PickupGameSelect {
     return {
       id: true,
       name: true,
@@ -682,10 +683,10 @@ export class PickupGamesService {
         },
       },
       _count: { select: { users: true } },
-    } as const;
+    };
   }
 
-  private pickupGameDetailSelect(userId: string) {
+  private pickupGameDetailSelect(userId: string): Prisma.PickupGameSelect {
     return {
       id: true,
       name: true,
@@ -750,10 +751,10 @@ export class PickupGamesService {
         },
       },
       _count: { select: { users: true } },
-    } as const;
+    };
   }
 
-  private userSelect() {
+  private userSelect(): Prisma.UserSelect {
     return {
       id: true,
       firstName: true,
@@ -761,6 +762,6 @@ export class PickupGamesService {
       nickname: true,
       email: true,
       status: true,
-    } as const;
+    };
   }
 }
