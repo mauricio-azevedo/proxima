@@ -1,23 +1,26 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
 
 import { AuthService } from '../../core/auth/auth.service';
-import type { GroupView } from '../../core/groups/groups.models';
-import { GroupsService } from '../../core/groups/groups.service';
+import type {
+  CreatePickupGameRequest,
+  PickupGameListItemView,
+} from '../../core/pickup-games/pickup-games.models';
+import { PickupGamesService } from '../../core/pickup-games/pickup-games.service';
 import { AppShellComponent } from '../../shared/app-shell/app-shell.component';
-import { CreateGroupDialogComponent } from './components/create-group-dialog/create-group-dialog.component';
-import { GroupsListComponent } from './components/groups-list/groups-list.component';
+import { CreatePickupGameDialogComponent } from './components/create-pickup-game-dialog/create-pickup-game-dialog.component';
+import { PickupGamesListComponent } from './components/pickup-games-list/pickup-games-list.component';
 
 @Component({
   selector: 'app-protected-home-page',
-  imports: [AppShellComponent, CreateGroupDialogComponent, GroupsListComponent],
+  imports: [AppShellComponent, CreatePickupGameDialogComponent, PickupGamesListComponent],
   templateUrl: './protected-home.page.html',
   styleUrl: './protected-home.page.scss',
 })
 export class ProtectedHomePage implements OnInit {
   private readonly authService = inject(AuthService);
-  private readonly groupsService = inject(GroupsService);
+  private readonly pickupGamesService = inject(PickupGamesService);
 
-  readonly groups = signal<GroupView[]>([]);
+  readonly pickupGames = signal<PickupGameListItemView[]>([]);
   readonly isLoading = signal(true);
   readonly isCreating = signal(false);
   readonly isCreateDialogOpen = signal(false);
@@ -25,21 +28,21 @@ export class ProtectedHomePage implements OnInit {
   readonly createErrorMessage = signal('');
 
   ngOnInit(): void {
-    this.loadGroups();
+    this.loadPickupGames();
   }
 
-  loadGroups(): void {
+  loadPickupGames(): void {
     this.isLoading.set(true);
     this.loadErrorMessage.set('');
 
-    this.groupsService.findAll().subscribe({
-      next: (groups) => {
-        this.groups.set(groups);
+    this.pickupGamesService.findAll().subscribe({
+      next: (pickupGames) => {
+        this.pickupGames.set(pickupGames);
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
-        this.loadErrorMessage.set('Não foi possível carregar seus grupos. Tente novamente.');
+        this.loadErrorMessage.set('Não foi possível carregar suas peladas. Tente novamente.');
       },
     });
   }
@@ -58,19 +61,22 @@ export class ProtectedHomePage implements OnInit {
     this.createErrorMessage.set('');
   }
 
-  createGroup(name: string): void {
+  createPickupGame(payload: CreatePickupGameRequest): void {
     this.createErrorMessage.set('');
     this.isCreating.set(true);
 
-    this.groupsService.create({ name }).subscribe({
-      next: (group) => {
-        this.groups.update((groups) => [group, ...groups.filter((current) => current.id !== group.id)]);
+    this.pickupGamesService.create(payload).subscribe({
+      next: (pickupGame) => {
+        this.pickupGames.update((pickupGames) => [
+          pickupGame,
+          ...pickupGames.filter((current) => current.id !== pickupGame.id),
+        ]);
         this.isCreating.set(false);
         this.isCreateDialogOpen.set(false);
       },
       error: () => {
         this.isCreating.set(false);
-        this.createErrorMessage.set('Não foi possível criar o grupo. Tente novamente.');
+        this.createErrorMessage.set('Não foi possível criar a pelada. Tente novamente.');
       },
     });
   }
