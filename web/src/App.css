@@ -59,28 +59,3 @@
   justify-content: center;
   padding: 1rem;
 }
-
-.user-menu-header {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-}
-
-.user-menu-header p {
-  margin: 0;
-}
-
-.menu-item-row {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-.menu-icon {
-  width: 1.25rem;
-  height: 1.25rem;
-  fill: currentColor;
-}
