@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Avatar, Dropdown, Label } from '@heroui/react';
+import { Avatar, Button, Dropdown, Input, Label, TextField } from '@heroui/react';
 import './App.css';
 
 type Screen = 'login' | 'register' | 'home' | 'search' | 'profile';
@@ -72,35 +72,33 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
               <p>Acesse sua conta para continuar.</p>
             </div>
 
-            <label className="field">
-              <span>Email</span>
-              <input
-                className="text-input"
-                required
+            <TextField isRequired className="field" name="email" type="email">
+              <Label>Email</Label>
+              <Input
+                fullWidth
                 type="email"
                 autoComplete="email"
                 placeholder="voce@email.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
               />
-            </label>
+            </TextField>
 
-            <label className="field">
-              <span>Senha</span>
-              <input
-                className="text-input"
-                required
+            <TextField isRequired className="field" name="password" type="password">
+              <Label>Senha</Label>
+              <Input
+                fullWidth
                 type="password"
                 autoComplete="current-password"
                 placeholder="Sua senha"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
-            </label>
+            </TextField>
 
-            <button type="submit" className="primary-button auth-submit" disabled={!password.trim()}>
+            <Button type="submit" variant="primary" fullWidth isDisabled={!password.trim()}>
               Entrar
-            </button>
+            </Button>
 
             <p className="auth-switch">
               Não tem conta?{' '}
@@ -149,51 +147,49 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
               <p>Use nome, email e senha para criar sua conta.</p>
             </div>
 
-            <label className="field">
-              <span>Nome</span>
-              <input
-                className="text-input"
-                required
+            <TextField isRequired className="field" name="name">
+              <Label>Nome</Label>
+              <Input
+                fullWidth
                 autoComplete="name"
                 placeholder="Seu nome"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
               />
-            </label>
+            </TextField>
 
-            <label className="field">
-              <span>Email</span>
-              <input
-                className="text-input"
-                required
+            <TextField isRequired className="field" name="email" type="email">
+              <Label>Email</Label>
+              <Input
+                fullWidth
                 type="email"
                 autoComplete="email"
                 placeholder="voce@email.com"
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
               />
-            </label>
+            </TextField>
 
-            <label className="field">
-              <span>Senha</span>
-              <input
-                className="text-input"
-                required
+            <TextField isRequired className="field" name="password" type="password">
+              <Label>Senha</Label>
+              <Input
+                fullWidth
                 type="password"
                 autoComplete="new-password"
                 placeholder="Crie uma senha"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
               />
-            </label>
+            </TextField>
 
-            <button
+            <Button
               type="submit"
-              className="primary-button auth-submit"
-              disabled={!name.trim() || !email.trim() || !password.trim()}
+              variant="primary"
+              fullWidth
+              isDisabled={!name.trim() || !email.trim() || !password.trim()}
             >
               Criar conta
-            </button>
+            </Button>
 
             <p className="auth-switch">
               Já tem conta?{' '}
