@@ -2,7 +2,7 @@
   <header class="top-bar">
     <div class="brand-area">
       @if (showBackLink) {
-        <a class="back-link" routerLink="/app" aria-label="Voltar para grupos">←</a>
+        <a class="back-link" routerLink="/app" aria-label="Voltar para peladas">←</a>
       }
 
       <a class="brand" routerLink="/app" aria-label="Próxima">Próxima</a>
@@ -33,12 +33,12 @@
 
   <nav class="bottom-nav" aria-label="Navegação principal">
     <a routerLink="/app" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
-      <span>🏟️</span>
-      Grupos
-    </a>
-    <a class="disabled" aria-disabled="true">
       <span>⚽</span>
       Peladas
+    </a>
+    <a class="disabled" aria-disabled="true">
+      <span>🔎</span>
+      Buscar
     </a>
     <a class="disabled" aria-disabled="true">
       <span>👤</span>
