@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Avatar, Button, Card, Dropdown, Input, Label } from '@heroui/react';
+import { Avatar, Dropdown, Label } from '@heroui/react';
 import './App.css';
 
 type Screen = 'login' | 'register' | 'home' | 'search' | 'profile';
@@ -65,36 +65,42 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
           <p>Lista, chegada, fila e partidas em um fluxo simples para a quadra.</p>
         </div>
 
-        <Card className="auth-card">
+        <section className="auth-card" aria-label="Formulário de login">
           <form className="auth-form" onSubmit={submit}>
             <div className="form-heading">
               <h2>Login</h2>
               <p>Acesse sua conta para continuar.</p>
             </div>
 
-            <Input
-              required
-              label="Email"
-              type="email"
-              autoComplete="email"
-              placeholder="voce@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
+            <label className="field">
+              <span>Email</span>
+              <input
+                className="text-input"
+                required
+                type="email"
+                autoComplete="email"
+                placeholder="voce@email.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
 
-            <Input
-              required
-              label="Senha"
-              type="password"
-              autoComplete="current-password"
-              placeholder="Sua senha"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <label className="field">
+              <span>Senha</span>
+              <input
+                className="text-input"
+                required
+                type="password"
+                autoComplete="current-password"
+                placeholder="Sua senha"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </label>
 
-            <Button type="submit" variant="primary" className="auth-submit" isDisabled={!password.trim()}>
+            <button type="submit" className="primary-button auth-submit" disabled={!password.trim()}>
               Entrar
-            </Button>
+            </button>
 
             <p className="auth-switch">
               Não tem conta?{' '}
@@ -103,7 +109,7 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
               </button>
             </p>
           </form>
-        </Card>
+        </section>
       </section>
     </main>
   );
@@ -136,50 +142,58 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
           <p>Comece com uma conta simples. O restante da pelada vem depois.</p>
         </div>
 
-        <Card className="auth-card">
+        <section className="auth-card" aria-label="Formulário de cadastro">
           <form className="auth-form" onSubmit={submit}>
             <div className="form-heading">
               <h2>Cadastro</h2>
               <p>Use nome, email e senha para criar sua conta.</p>
             </div>
 
-            <Input
-              required
-              label="Nome"
-              autoComplete="name"
-              placeholder="Seu nome"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
+            <label className="field">
+              <span>Nome</span>
+              <input
+                className="text-input"
+                required
+                autoComplete="name"
+                placeholder="Seu nome"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+              />
+            </label>
 
-            <Input
-              required
-              label="Email"
-              type="email"
-              autoComplete="email"
-              placeholder="voce@email.com"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
+            <label className="field">
+              <span>Email</span>
+              <input
+                className="text-input"
+                required
+                type="email"
+                autoComplete="email"
+                placeholder="voce@email.com"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </label>
 
-            <Input
-              required
-              label="Senha"
-              type="password"
-              autoComplete="new-password"
-              placeholder="Crie uma senha"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
+            <label className="field">
+              <span>Senha</span>
+              <input
+                className="text-input"
+                required
+                type="password"
+                autoComplete="new-password"
+                placeholder="Crie uma senha"
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+            </label>
 
-            <Button
+            <button
               type="submit"
-              variant="primary"
-              className="auth-submit"
-              isDisabled={!name.trim() || !email.trim() || !password.trim()}
+              className="primary-button auth-submit"
+              disabled={!name.trim() || !email.trim() || !password.trim()}
             >
               Criar conta
-            </Button>
+            </button>
 
             <p className="auth-switch">
               Já tem conta?{' '}
@@ -188,7 +202,7 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
               </button>
             </p>
           </form>
-        </Card>
+        </section>
       </section>
     </main>
   );
