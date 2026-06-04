@@ -5,6 +5,7 @@ import type { UserSession } from './types/user-session';
 import { LoginPage } from '../features/auth/login/LoginPage';
 import { RegisterPage } from '../features/auth/register/RegisterPage';
 import { AppShell } from '../shared/layout/AppShell';
+import '../App.css';
 
 export type AuthScreen = 'login' | 'register';
 
