@@ -1,0 +1,44 @@
+<section class="pickup-games-content" aria-labelledby="pickup-games-title">
+  <div class="section-header">
+    <div>
+      <h2 id="pickup-games-title">Peladas</h2>
+      <p>
+        {{ pickupGames.length }} pelada{{ pickupGames.length === 1 ? '' : 's' }} encontrada{{ pickupGames.length === 1 ? '' : 's' }}
+      </p>
+    </div>
+
+    <button class="ghost-button" type="button" (click)="reloadRequested.emit()" [disabled]="isLoading">
+      Atualizar
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="state-card loading-state" aria-live="polite">
+      <span class="spinner" aria-hidden="true"></span>
+      <p>Carregando suas peladas...</p>
+    </div>
+  } @else if (errorMessage) {
+    <div class="state-card error-state" role="alert">
+      <strong>Não conseguimos carregar suas peladas.</strong>
+      <p>{{ errorMessage }}</p>
+      <button class="secondary-button" type="button" (click)="reloadRequested.emit()">
+        Tentar novamente
+      </button>
+    </div>
+  } @else if (!hasPickupGames) {
+    <div class="empty-state">
+      <div class="empty-icon" aria-hidden="true">+</div>
+      <h2>Crie sua primeira pelada</h2>
+      <p>Cadastre uma pelada recorrente para abrir a lista do próximo dia e organizar a fila da quadra.</p>
+      <button class="primary-button" type="button" (click)="createPickupGameRequested.emit()">
+        Criar pelada
+      </button>
+    </div>
+  } @else {
+    <div class="pickup-games-grid">
+      @for (pickupGame of pickupGames; track pickupGame.id) {
+        <app-pickup-game-card [pickupGame]="pickupGame" />
+      }
+    </div>
+  }
+</section>
