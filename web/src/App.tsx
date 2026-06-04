@@ -73,7 +73,7 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
             </div>
 
             <Input
-              isRequired
+              required
               label="Email"
               type="email"
               autoComplete="email"
@@ -83,7 +83,7 @@ function LoginScreen({ onRegisterRequested, onLoggedIn }: LoginScreenProps) {
             />
 
             <Input
-              isRequired
+              required
               label="Senha"
               type="password"
               autoComplete="current-password"
@@ -144,7 +144,7 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
             </div>
 
             <Input
-              isRequired
+              required
               label="Nome"
               autoComplete="name"
               placeholder="Seu nome"
@@ -153,7 +153,7 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
             />
 
             <Input
-              isRequired
+              required
               label="Email"
               type="email"
               autoComplete="email"
@@ -163,7 +163,7 @@ function RegisterScreen({ onLoginRequested, onRegistered }: RegisterScreenProps)
             />
 
             <Input
-              isRequired
+              required
               label="Senha"
               type="password"
               autoComplete="new-password"
@@ -263,10 +263,8 @@ function UserMenu({ user, onLogout }: UserMenuProps) {
             </div>
           </Dropdown.Item>
 
-          <Dropdown.Separator />
-
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="menu-item-row danger">
+            <div className="menu-item-row danger separated">
               <Label>Sair</Label>
               <LogoutIcon />
             </div>
