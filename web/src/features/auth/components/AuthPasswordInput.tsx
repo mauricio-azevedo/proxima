@@ -26,9 +26,21 @@ export function AuthPasswordInput({ autoComplete, value, onChange }: AuthPasswor
         <InputGroup.Prefix>
           <Lock />
         </InputGroup.Prefix>
-        <InputGroup.Input autoComplete={autoComplete} type={inputType} value={value} onChange={onChange} />
-        <InputGroup.Suffix>
-          <Button type="button" variant="tertiary" size="sm" isIconOnly aria-label={visibilityLabel} onPress={togglePasswordVisibility}>
+        <InputGroup.Input
+          autoComplete={autoComplete}
+          type={inputType}
+          value={value}
+          onChange={onChange}
+        />
+        <InputGroup.Suffix className="pr-0">
+          <Button
+            type="button"
+            variant="tertiary"
+            size="sm"
+            isIconOnly
+            aria-label={visibilityLabel}
+            onPress={togglePasswordVisibility}
+          >
             <VisibilityIcon />
           </Button>
         </InputGroup.Suffix>
