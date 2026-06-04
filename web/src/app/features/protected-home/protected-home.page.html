@@ -1,25 +1,25 @@
 <app-shell
-  eyebrow="Grupos"
-  title="Suas turmas"
-  subtitle="Entre em um grupo para gerenciar membros, peladas e a fila da próxima partida."
-  actionLabel="Novo grupo"
+  eyebrow="Peladas"
+  title="Suas peladas"
+  subtitle="Acompanhe as peladas recorrentes, entre na lista do próximo dia e veja quando a fila começar."
+  actionLabel="Nova pelada"
   (primaryActionRequested)="openCreateDialog()"
   (logoutRequested)="logout()"
 >
-  <app-groups-list
-    [groups]="groups()"
+  <app-pickup-games-list
+    [pickupGames]="pickupGames()"
     [isLoading]="isLoading()"
     [errorMessage]="loadErrorMessage()"
-    (reloadRequested)="loadGroups()"
-    (createGroupRequested)="openCreateDialog()"
+    (reloadRequested)="loadPickupGames()"
+    (createPickupGameRequested)="openCreateDialog()"
   />
 
   @if (isCreateDialogOpen()) {
-    <app-create-group-dialog
+    <app-create-pickup-game-dialog
       [isCreating]="isCreating()"
       [errorMessage]="createErrorMessage()"
       (closed)="closeCreateDialog()"
-      (submitted)="createGroup($event)"
+      (submitted)="createPickupGame($event)"
     />
   }
 </app-shell>
