@@ -1,8 +1,8 @@
-import { Avatar, Dropdown, Label, Tab, Tabs } from '@heroui/react';
+import { Avatar, Dropdown, Label, Tabs } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
-import { GearIcon, HomeIcon, LogoutIcon, SearchIcon, UserIcon } from '../icons/app-icons';
+import { GearIcon, LogoutIcon } from '../icons/app-icons';
 
 interface AppShellProps {
   activeTab: AppTab;
@@ -22,14 +22,25 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
       <section className="app-content" />
 
       <nav className="app-dock" aria-label="Navegação principal">
-        <Tabs
-          aria-label="Navegação principal"
-          selectedKey={activeTab}
-          onSelectionChange={(key) => onTabChange(key as AppTab)}
-        >
-          <Tab key="home" title={<HomeIcon className="icon" />} />
-          <Tab key="search" title={<SearchIcon className="icon" />} />
-          <Tab key="profile" title={<UserIcon className="icon" />} />
+        <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
+          <Tabs.ListContainer>
+            <Tabs.List aria-label="Navegação principal">
+              <Tabs.Tab id="home">
+                Início
+                <Tabs.Indicator />
+              </Tabs.Tab>
+
+              <Tabs.Tab id="search">
+                Buscar
+                <Tabs.Indicator />
+              </Tabs.Tab>
+
+              <Tabs.Tab id="profile">
+                Perfil
+                <Tabs.Indicator />
+              </Tabs.Tab>
+            </Tabs.List>
+          </Tabs.ListContainer>
         </Tabs>
       </nav>
     </main>
