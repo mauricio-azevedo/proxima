@@ -1,27 +1,29 @@
-import type { ReactNode } from 'react'
-import { Avatar, Dropdown, Label } from '@heroui/react'
-import { GearIcon, HomeIcon, LogoutIcon, SearchIcon, UserIcon } from './icons'
+import type { ReactNode } from 'react';
+import { Avatar, Dropdown, Label, Separator } from '@heroui/react';
+import { GearIcon, HomeIcon, LogoutIcon, SearchIcon, UserIcon } from './icons';
 
 type User = {
-  name: string
-  email: string
-  initials: string
-}
+  name: string;
+  email: string;
+  initials: string;
+};
 
 type AppShellProps = {
-  title: string
-  user: User
-  children: ReactNode
-  activeTab?: 'home' | 'search' | 'profile'
-  onLogout?: () => void
-}
+  title: string;
+  user: User;
+  children: ReactNode;
+  activeTab?: 'home' | 'search' | 'profile';
+  onLogout?: () => void;
+};
 
 export function AppShell({ title, user, children, activeTab = 'home', onLogout }: AppShellProps) {
   return (
     <main className="min-h-svh bg-zinc-950 text-zinc-50">
       <header className="sticky top-0 z-30 border-b border-white/10 bg-zinc-950/82 px-5 py-3 backdrop-blur-2xl">
         <div className="mx-auto flex h-12 w-full max-w-3xl items-center justify-between">
-          <h1 className="text-[1.7rem] leading-none font-semibold tracking-[-0.05em] text-white">{title}</h1>
+          <h1 className="text-[1.7rem] leading-none font-semibold tracking-[-0.05em] text-white">
+            {title}
+          </h1>
           <UserMenu user={user} onLogout={onLogout} />
         </div>
       </header>
@@ -32,7 +34,7 @@ export function AppShell({ title, user, children, activeTab = 'home', onLogout }
 
       <BottomDock activeTab={activeTab} />
     </main>
-  )
+  );
 }
 
 function UserMenu({ user, onLogout }: { user: User; onLogout?: () => void }) {
@@ -62,8 +64,9 @@ function UserMenu({ user, onLogout }: { user: User; onLogout?: () => void }) {
               <GearIcon className="size-4 text-muted" />
             </div>
           </Dropdown.Item>
+          <Separator />
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="flex w-full items-center justify-between gap-3 border-t border-default-200 pt-2">
+            <div className="flex w-full items-center justify-between gap-3 pt-2">
               <Label>Sair</Label>
               <LogoutIcon className="size-4 text-danger" />
             </div>
@@ -71,12 +74,15 @@ function UserMenu({ user, onLogout }: { user: User; onLogout?: () => void }) {
         </Dropdown.Menu>
       </Dropdown.Popover>
     </Dropdown>
-  )
+  );
 }
 
 function BottomDock({ activeTab }: { activeTab: 'home' | 'search' | 'profile' }) {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-30 px-5 pb-[max(1rem,env(safe-area-inset-bottom))]" aria-label="Principal">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-30 px-5 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      aria-label="Principal"
+    >
       <div className="mx-auto grid h-16 w-full max-w-sm grid-cols-3 items-center rounded-[2rem] border border-white/10 bg-zinc-900/88 p-1.5 shadow-2xl shadow-black/40 backdrop-blur-2xl">
         <DockButton label="Início" active={activeTab === 'home'} href="/app">
           <HomeIcon className="size-6" />
@@ -89,7 +95,7 @@ function BottomDock({ activeTab }: { activeTab: 'home' | 'search' | 'profile' })
         </DockButton>
       </div>
     </nav>
-  )
+  );
 }
 
 function DockButton({
@@ -98,10 +104,10 @@ function DockButton({
   active,
   children,
 }: {
-  label: string
-  href: string
-  active: boolean
-  children: ReactNode
+  label: string;
+  href: string;
+  active: boolean;
+  children: ReactNode;
 }) {
   return (
     <a
@@ -110,10 +116,12 @@ function DockButton({
       aria-current={active ? 'page' : undefined}
       className={[
         'mx-auto flex size-12 items-center justify-center rounded-full transition',
-        active ? 'bg-white text-zinc-950 shadow-lg shadow-white/10' : 'text-zinc-400 hover:bg-white/8 hover:text-white',
+        active
+          ? 'bg-white text-zinc-950 shadow-lg shadow-white/10'
+          : 'text-zinc-400 hover:bg-white/8 hover:text-white',
       ].join(' ')}
     >
       {children}
     </a>
-  )
+  );
 }
