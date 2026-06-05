@@ -16,7 +16,12 @@ interface RegisterPageProps {
   onLoginRequested: () => void;
 }
 
-export function RegisterPage({ errorMessage, isSubmitting, onRegisterRequested, onLoginRequested }: RegisterPageProps) {
+export function RegisterPage({
+  errorMessage,
+  isSubmitting,
+  onRegisterRequested,
+  onLoginRequested,
+}: RegisterPageProps) {
   const { t } = useLocale();
   const firstName = useAuthFormField('');
   const lastName = useAuthFormField('');
@@ -58,11 +63,44 @@ export function RegisterPage({ errorMessage, isSubmitting, onRegisterRequested, 
             </Card.Header>
 
             <Card.Content className="auth-fields">
-              <AuthTextInput autoComplete="given-name" icon={Person} label={t('auth.firstName')} name="firstName" value={firstName.value} onChange={firstName.onChange} />
-              <AuthTextInput autoComplete="family-name" icon={Person} label={t('auth.lastName')} name="lastName" value={lastName.value} onChange={lastName.onChange} />
-              <AuthTextInput autoComplete="nickname" icon={Person} label={t('auth.nickname')} name="nickname" value={nickname.value} onChange={nickname.onChange} />
-              <AuthTextInput autoComplete="email" icon={Envelope} label={t('auth.email')} name="email" type="email" value={email.value} onChange={email.onChange} />
-              <AuthPasswordInput autoComplete="new-password" value={password.value} onChange={password.onChange} />
+              <AuthTextInput
+                autoComplete="given-name"
+                icon={Person}
+                label={t('auth.firstName')}
+                name="firstName"
+                value={firstName.value}
+                onChange={firstName.onChange}
+              />
+              <AuthTextInput
+                autoComplete="family-name"
+                icon={Person}
+                label={t('auth.lastName')}
+                name="lastName"
+                value={lastName.value}
+                onChange={lastName.onChange}
+              />
+              <AuthTextInput
+                autoComplete="nickname"
+                icon={Person}
+                label={t('auth.nickname')}
+                name="nickname"
+                value={nickname.value}
+                onChange={nickname.onChange}
+              />
+              <AuthTextInput
+                autoComplete="email"
+                icon={Envelope}
+                label={t('auth.email')}
+                name="email"
+                type="email"
+                value={email.value}
+                onChange={email.onChange}
+              />
+              <AuthPasswordInput
+                autoComplete="new-password"
+                value={password.value}
+                onChange={password.onChange}
+              />
 
               {errorMessage ? (
                 <Typography.Paragraph size="sm" className="text-danger">
@@ -77,7 +115,11 @@ export function RegisterPage({ errorMessage, isSubmitting, onRegisterRequested, 
               </Button>
 
               <Typography.Paragraph size="sm" color="muted">
-                {t('auth.switchToLogin')} <Link onPress={onLoginRequested}>{t('auth.switchToLogin.action')}</Link>
+                {t('auth.switchToLogin')}{' '}
+                <Link onPress={onLoginRequested}>
+                  {t('auth.switchToLogin.action')}
+                  <Link.Icon></Link.Icon>
+                </Link>
               </Typography.Paragraph>
             </Card.Footer>
           </Form>

@@ -16,7 +16,12 @@ interface LoginPageProps {
   onRegisterRequested: () => void;
 }
 
-export function LoginPage({ errorMessage, isSubmitting, onLoginRequested, onRegisterRequested }: LoginPageProps) {
+export function LoginPage({
+  errorMessage,
+  isSubmitting,
+  onLoginRequested,
+  onRegisterRequested,
+}: LoginPageProps) {
   const { t } = useLocale();
   const email = useAuthFormField('');
   const password = useAuthFormField('');
@@ -55,7 +60,11 @@ export function LoginPage({ errorMessage, isSubmitting, onLoginRequested, onRegi
                 value={email.value}
                 onChange={email.onChange}
               />
-              <AuthPasswordInput autoComplete="current-password" value={password.value} onChange={password.onChange} />
+              <AuthPasswordInput
+                autoComplete="current-password"
+                value={password.value}
+                onChange={password.onChange}
+              />
 
               {errorMessage ? (
                 <Typography.Paragraph size="sm" className="text-danger">
@@ -70,7 +79,11 @@ export function LoginPage({ errorMessage, isSubmitting, onLoginRequested, onRegi
               </Button>
 
               <Typography.Paragraph size="sm" color="muted">
-                {t('auth.switchToRegister')} <Link onPress={onRegisterRequested}>{t('auth.switchToRegister.action')}</Link>
+                {t('auth.switchToRegister')}{' '}
+                <Link onPress={onRegisterRequested}>
+                  {t('auth.switchToRegister.action')}
+                  <Link.Icon></Link.Icon>
+                </Link>
               </Typography.Paragraph>
             </Card.Footer>
           </Form>
