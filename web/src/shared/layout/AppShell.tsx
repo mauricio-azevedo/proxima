@@ -62,14 +62,14 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
         </Avatar>
       </Dropdown.Trigger>
 
-      <Dropdown.Popover>
-        <div className="w-64 px-3 pt-3 pb-1">
+      <Dropdown.Popover className="w-64 overflow-hidden">
+        <div className="w-full px-3 pt-3 pb-1">
           <div className="flex min-w-0 items-center gap-2">
             <Avatar size="sm">
               <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
             </Avatar>
 
-            <div className="flex min-w-0 flex-col gap-0">
+            <div className="min-w-0 flex-1">
               <p className="truncate text-sm leading-5 font-medium" title={user.name}>
                 {user.name}
               </p>
@@ -80,29 +80,29 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
           </div>
         </div>
 
-        <Dropdown.Menu>
+        <Dropdown.Menu className="w-full min-w-0">
           <Dropdown.Item id="profile" textValue="Perfil">
-            <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center justify-between gap-2">
               <Label>Perfil</Label>
-              <Person className="size-3.5 text-muted" />
+              <Person className="size-3.5 shrink-0 text-muted" />
             </div>
           </Dropdown.Item>
 
           <Dropdown.Item id="settings" textValue="Configurações">
-            <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center justify-between gap-2">
               <Label>Configurações</Label>
-              <Gear className="size-3.5 text-muted" />
+              <Gear className="size-3.5 shrink-0 text-muted" />
             </div>
           </Dropdown.Item>
         </Dropdown.Menu>
 
         <Separator />
 
-        <Dropdown.Menu>
+        <Dropdown.Menu className="w-full min-w-0">
           <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="flex w-full items-center justify-between gap-2">
+            <div className="flex min-w-0 items-center justify-between gap-2">
               <Label>Sair</Label>
-              <ArrowRightFromSquare className="size-3.5 text-danger" />
+              <ArrowRightFromSquare className="size-3.5 shrink-0 text-danger" />
             </div>
           </Dropdown.Item>
         </Dropdown.Menu>
