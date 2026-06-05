@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Envelope } from '@gravity-ui/icons';
 import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
@@ -12,33 +10,25 @@ import { useAuthFormField } from '../hooks/use-auth-form-field';
 import type { LoginRequest } from '../types/login-request';
 
 interface LoginPageProps {
-  onLoginRequested: (payload: LoginRequest) => Promise<void>;
+  errorMessage: string | null;
+  isSubmitting: boolean;
+  onLoginRequested: (payload: LoginRequest) => void;
   onRegisterRequested: () => void;
 }
 
-export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPageProps) {
+export function LoginPage({ errorMessage, isSubmitting, onLoginRequested, onRegisterRequested }: LoginPageProps) {
   const { t } = useLocale();
   const email = useAuthFormField('');
   const password = useAuthFormField('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmitDisabled = isSubmitting || !email.value.trim() || !password.value.trim();
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setErrorMessage(null);
-    setIsSubmitting(true);
 
-    try {
-      await onLoginRequested({
-        email: email.value.trim(),
-        password: password.value,
-      });
-    } catch (error) {
-      setErrorMessage(readErrorMessage(error, t('auth.login.errorFallback')));
-    } finally {
-      setIsSubmitting(false);
-    }
+    onLoginRequested({
+      email: email.value.trim(),
+      password: password.value,
+    });
   }
 
   return (
@@ -88,12 +78,4 @@ export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPagePr
       </div>
     </main>
   );
-}
-
-function readErrorMessage(error: unknown, fallbackMessage: string) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return fallbackMessage;
 }
