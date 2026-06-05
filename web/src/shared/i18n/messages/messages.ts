@@ -1,6 +1,7 @@
 export const messages = {
   'en-US': {
     'app.loading.description': 'We are securely restoring your session.',
+    'app.loading.label': 'Loading',
     'app.loading.title': 'Preparing your workspace',
     'app.navigation.main': 'Main navigation',
     'app.tabs.home': 'Home',
@@ -39,6 +40,7 @@ export const messages = {
   },
   'pt-BR': {
     'app.loading.description': 'Estamos restaurando sua sessão com segurança.',
+    'app.loading.label': 'Carregando',
     'app.loading.title': 'Preparando seu espaço',
     'app.navigation.main': 'Navegação principal',
     'app.tabs.home': 'Início',
