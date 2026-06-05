@@ -1,6 +1,6 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 
-import { GameDayStatus, MatchStatus, Weekday } from '../../generated/prisma';
+import { GameDayStatus, MatchStatus, PickupGameUserRole, Weekday } from '../../generated/prisma';
 import { PrismaService } from '../database/prisma.service';
 
 const OPEN_GAME_DAY_STATUSES = [
@@ -80,12 +80,12 @@ export class GameDaysService {
   }
 
   private async ensureAdmin(userId: string, pickupGameId: string): Promise<void> {
-    const admin = await this.prisma.pickupGameAdmin.findUnique({
+    const membership = await this.prisma.pickupGameUser.findUnique({
       where: { pickupGameId_userId: { pickupGameId, userId } },
-      select: { id: true },
+      select: { role: true },
     });
 
-    if (!admin) {
+    if (membership?.role !== PickupGameUserRole.ADMIN) {
       throw new ForbiddenException('Only pickup game admins can perform this action.');
     }
   }
@@ -134,17 +134,8 @@ export class GameDaysService {
     const nextDate = this.nextDateAfter(pickupGame.weekday, currentDate);
 
     await this.prisma.gameDay.upsert({
-      where: {
-        pickupGameId_date: {
-          pickupGameId,
-          date: nextDate,
-        },
-      },
-      create: {
-        pickupGameId,
-        date: nextDate,
-        teamSize: pickupGame.defaultTeamSize,
-      },
+      where: { pickupGameId_date: { pickupGameId, date: nextDate } },
+      create: { pickupGameId, date: nextDate, teamSize: pickupGame.defaultTeamSize },
       update: {},
     });
   }
@@ -158,17 +149,12 @@ export class GameDaysService {
     return new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() + daysUntilTarget));
   }
 
-  private nextDateAfter(weekday: Weekday, currentDate: Date): Date {
+  private nextDateAfter(weekday: Weekday, date: Date): Date {
     const targetDay = WEEKDAY_TO_UTC_DAY[weekday];
-    const currentDay = currentDate.getUTCDay();
-    const rawDaysUntilTarget = (targetDay - currentDay + 7) % 7;
-    const daysUntilTarget = rawDaysUntilTarget === 0 ? 7 : rawDaysUntilTarget;
+    const currentDay = date.getUTCDay();
+    const daysUntilTarget = ((targetDay - currentDay + 7) % 7) || 7;
 
-    return new Date(Date.UTC(
-      currentDate.getUTCFullYear(),
-      currentDate.getUTCMonth(),
-      currentDate.getUTCDate() + daysUntilTarget,
-    ));
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + daysUntilTarget));
   }
 
   private todayUtcDate(): Date {
