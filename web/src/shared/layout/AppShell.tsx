@@ -3,7 +3,7 @@ import { Avatar, Dropdown, Label, Separator, Tabs } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
-import { ThemeSwitch } from '../theme/components/ThemeSwitch';
+import { ThemeToggleButton } from '../theme/components/ThemeToggleButton';
 
 interface AppShellProps {
   activeTab: AppTab;
@@ -18,7 +18,7 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
       <header className="app-header">
         <h1>{getTabTitle(activeTab)}</h1>
         <div className="app-header-actions">
-          <ThemeSwitch />
+          <ThemeToggleButton />
           <UserMenu user={user} onLogout={onLogout} />
         </div>
       </header>
