@@ -9,7 +9,7 @@ import {
   GameDayStatus,
   MatchSide,
   MatchStatus,
-  PickupGameAdminRole,
+  PickupGameUserRole,
   PickupGameVisibility,
   Weekday,
 } from '../../generated/prisma';
@@ -72,18 +72,11 @@ export class PickupGamesService {
         select: { id: true },
       });
 
-      await transaction.pickupGameAdmin.create({
-        data: {
-          pickupGameId: createdPickupGame.id,
-          userId,
-          role: PickupGameAdminRole.OWNER,
-        },
-      });
-
       await transaction.pickupGameUser.create({
         data: {
           pickupGameId: createdPickupGame.id,
           userId,
+          role: PickupGameUserRole.ADMIN,
         },
       });
 
@@ -384,7 +377,6 @@ export class PickupGamesService {
       OR: [
         { visibility: PickupGameVisibility.PUBLIC },
         { users: { some: { userId } } },
-        { admins: { some: { userId } } },
       ],
     };
   }
@@ -401,12 +393,12 @@ export class PickupGamesService {
   }
 
   private async ensureAdmin(userId: string, pickupGameId: string): Promise<void> {
-    const admin = await this.prisma.pickupGameAdmin.findUnique({
+    const membership = await this.prisma.pickupGameUser.findUnique({
       where: { pickupGameId_userId: { pickupGameId, userId } },
-      select: { id: true },
+      select: { role: true },
     });
 
-    if (!admin) {
+    if (membership?.role !== PickupGameUserRole.ADMIN) {
       throw new ForbiddenException('Only pickup game admins can perform this action.');
     }
   }
@@ -668,8 +660,7 @@ export class PickupGamesService {
       visibility: true,
       createdAt: true,
       updatedAt: true,
-      users: { where: { userId }, select: { id: true }, take: 1 },
-      admins: { where: { userId }, select: { id: true, role: true }, take: 1 },
+      users: { where: { userId }, select: { id: true, role: true }, take: 1 },
       days: {
         where: { status: { in: OPEN_GAME_DAY_STATUSES } },
         orderBy: { date: 'asc' },
@@ -697,8 +688,7 @@ export class PickupGamesService {
       visibility: true,
       createdAt: true,
       updatedAt: true,
-      users: { where: { userId }, select: { id: true }, take: 1 },
-      admins: { where: { userId }, select: { id: true, role: true }, take: 1 },
+      users: { where: { userId }, select: { id: true, role: true }, take: 1 },
       days: {
         where: { status: { in: OPEN_GAME_DAY_STATUSES } },
         orderBy: { date: 'asc' },
