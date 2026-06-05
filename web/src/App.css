@@ -37,6 +37,11 @@
   padding-top: 1.25rem;
 }
 
+.auth-loading-content {
+  display: grid;
+  gap: 0.5rem;
+}
+
 .app-frame {
   min-height: 100svh;
   display: flex;
