@@ -2,6 +2,7 @@ import { Envelope, Person } from '@gravity-ui/icons';
 import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
 import type { UserSession } from '../../../app/types/user-session';
+import { ThemeSwitch } from '../../../shared/theme/components/ThemeSwitch';
 import { AuthPasswordInput } from '../components/AuthPasswordInput';
 import { AuthTextInput } from '../components/AuthTextInput';
 import { defaultUserSession } from '../constants/default-user-session';
@@ -27,42 +28,48 @@ export function RegisterPage({ onRegistered, onLoginRequested }: RegisterPagePro
 
   return (
     <main className="auth-screen">
-      <Card className="auth-card">
-        <Form aria-label="Cadastro" className="auth-form" onSubmit={submit}>
-          <Card.Header>
-            <Typography.Heading level={1}>Cadastro</Typography.Heading>
-          </Card.Header>
+      <div className="auth-shell">
+        <div className="auth-theme-switch">
+          <ThemeSwitch />
+        </div>
 
-          <Card.Content className="auth-fields">
-            <AuthTextInput autoComplete="name" icon={Person} label="Nome" name="name" value={name.value} onChange={name.onChange} />
-            <AuthTextInput
-              autoComplete="email"
-              icon={Envelope}
-              label="Email"
-              name="email"
-              type="email"
-              value={email.value}
-              onChange={email.onChange}
-            />
-            <AuthPasswordInput autoComplete="new-password" value={password.value} onChange={password.onChange} />
-          </Card.Content>
+        <Card className="auth-card">
+          <Form aria-label="Cadastro" className="auth-form" onSubmit={submit}>
+            <Card.Header>
+              <Typography.Heading level={1}>Cadastro</Typography.Heading>
+            </Card.Header>
 
-          <Card.Footer className="auth-actions">
-            <Button
-              type="submit"
-              variant="primary"
-              fullWidth
-              isDisabled={!name.value.trim() || !email.value.trim() || !password.value.trim()}
-            >
-              Criar conta
-            </Button>
+            <Card.Content className="auth-fields">
+              <AuthTextInput autoComplete="name" icon={Person} label="Nome" name="name" value={name.value} onChange={name.onChange} />
+              <AuthTextInput
+                autoComplete="email"
+                icon={Envelope}
+                label="Email"
+                name="email"
+                type="email"
+                value={email.value}
+                onChange={email.onChange}
+              />
+              <AuthPasswordInput autoComplete="new-password" value={password.value} onChange={password.onChange} />
+            </Card.Content>
 
-            <Typography.Paragraph size="sm" color="muted">
-              Já tem conta? <Link onPress={onLoginRequested}>Entrar</Link>
-            </Typography.Paragraph>
-          </Card.Footer>
-        </Form>
-      </Card>
+            <Card.Footer className="auth-actions">
+              <Button
+                type="submit"
+                variant="primary"
+                fullWidth
+                isDisabled={!name.value.trim() || !email.value.trim() || !password.value.trim()}
+              >
+                Criar conta
+              </Button>
+
+              <Typography.Paragraph size="sm" color="muted">
+                Já tem conta? <Link onPress={onLoginRequested}>Entrar</Link>
+              </Typography.Paragraph>
+            </Card.Footer>
+          </Form>
+        </Card>
+      </div>
     </main>
   );
 }
