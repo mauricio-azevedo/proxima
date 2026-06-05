@@ -10,8 +10,16 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #f6f7f9;
-  color: #111827;
+  --app-background: #f6f7f9;
+  --app-foreground: #111827;
+  background: var(--app-background);
+  color: var(--app-foreground);
+}
+
+.dark {
+  color-scheme: dark;
+  --app-background: #05070a;
+  --app-foreground: #f9fafb;
 }
 
 * {
@@ -28,7 +36,8 @@ body {
   min-width: 320px;
   min-height: 100svh;
   margin: 0;
-  background: #f6f7f9;
+  background: var(--app-background);
+  color: var(--app-foreground);
 }
 
 button,
