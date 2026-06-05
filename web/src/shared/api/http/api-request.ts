@@ -32,5 +32,9 @@ async function readJsonResponse(response: Response) {
     return null;
   }
 
-  return JSON.parse(text) as unknown;
+  try {
+    return JSON.parse(text) as unknown;
+  } catch {
+    return null;
+  }
 }
