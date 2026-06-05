@@ -1,13 +1,17 @@
 import { useState, type ReactElement } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 
-import type { LoginRequest } from '../features/auth/types/login-request';
-import type { RegisterRequest } from '../features/auth/types/register-request';
 import { useAuthSession } from '../features/auth/hooks/use-auth-session';
 import { LoginPage } from '../features/auth/login/LoginPage';
 import { RegisterPage } from '../features/auth/register/RegisterPage';
 import { AuthSessionLoadingPage } from '../features/auth/session/AuthSessionLoadingPage';
+import type { AuthOperation } from '../features/auth/types/auth-operation';
+import type { LoginRequest } from '../features/auth/types/login-request';
+import type { RegisterRequest } from '../features/auth/types/register-request';
+import { useLocale } from '../shared/i18n/hooks/use-locale';
 import { AppShell } from '../shared/layout/AppShell';
+import { PageFade } from '../shared/ui/PageFade';
 import '../App.css';
 import type { AppTab } from './types/app-tab';
 
@@ -16,70 +20,111 @@ interface RouteState {
 }
 
 export function App() {
+  const { t } = useLocale();
   const [activeTab, setActiveTab] = useState<AppTab>('home');
+  const [authOperation, setAuthOperation] = useState<AuthOperation>(null);
+  const [authErrorMessage, setAuthErrorMessage] = useState<string | null>(null);
   const authSession = useAuthSession();
   const location = useLocation();
   const navigate = useNavigate();
+  const authenticated = isAuthenticated(authSession);
+  const isAuthPending = authSession.status === 'checking' || authOperation !== null;
 
-  async function login(payload: LoginRequest) {
-    await authSession.login(payload);
-    setActiveTab('home');
-    navigate(getAuthenticatedRedirectPath(location.state), { replace: true });
+  function login(payload: LoginRequest) {
+    void authenticate('login', payload);
   }
 
-  async function register(payload: RegisterRequest) {
-    await authSession.register(payload);
-    setActiveTab('home');
-    navigate('/app', { replace: true });
+  function register(payload: RegisterRequest) {
+    void authenticate('register', payload);
+  }
+
+  async function authenticate(operation: Exclude<AuthOperation, null>, payload: LoginRequest | RegisterRequest) {
+    setAuthErrorMessage(null);
+    setAuthOperation(operation);
+
+    try {
+      if (operation === 'login') {
+        await authSession.login(payload as LoginRequest);
+        navigate(getAuthenticatedRedirectPath(location.state), { replace: true });
+      } else {
+        await authSession.register(payload as RegisterRequest);
+        navigate('/app', { replace: true });
+      }
+
+      setActiveTab('home');
+    } catch (error) {
+      setAuthErrorMessage(readAuthErrorMessage(error, getAuthFallbackMessage(operation, t)));
+    } finally {
+      setAuthOperation(null);
+    }
   }
 
   function logout() {
     authSession.logout();
     setActiveTab('home');
+    setAuthErrorMessage(null);
     navigate('/login', { replace: true });
   }
 
-  if (authSession.status === 'checking') {
-    return <AuthSessionLoadingPage />;
-  }
-
-  const authenticated = isAuthenticated(authSession);
-
   return (
-    <Routes>
-      <Route
-        path="/login"
-        element={
-          <GuestRoute
-            isAuthenticated={authenticated}
-            element={<LoginPage onLoginRequested={login} onRegisterRequested={() => navigate('/register')} />}
-          />
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <GuestRoute
-            isAuthenticated={authenticated}
-            element={<RegisterPage onLoginRequested={() => navigate('/login')} onRegisterRequested={register} />}
-          />
-        }
-      />
-      <Route
-        path="/app"
-        element={
-          <ProtectedRoute
-            isAuthenticated={authenticated}
-            element={
-              authSession.user ? (
-                <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />
-              ) : null
-            }
-          />
-        }
-      />
-      <Route path="*" element={<Navigate to={authenticated ? '/app' : '/login'} replace />} />
-    </Routes>
+    <AnimatePresence mode="wait">
+      {isAuthPending ? (
+        <PageFade key="auth-loading">
+          <AuthSessionLoadingPage />
+        </PageFade>
+      ) : (
+        <PageFade key={location.pathname}>
+          <Routes location={location}>
+            <Route
+              path="/login"
+              element={
+                <GuestRoute
+                  isAuthenticated={authenticated}
+                  element={
+                    <LoginPage
+                      errorMessage={authErrorMessage}
+                      isSubmitting={authOperation === 'login'}
+                      onLoginRequested={login}
+                      onRegisterRequested={() => navigate('/register')}
+                    />
+                  }
+                />
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                <GuestRoute
+                  isAuthenticated={authenticated}
+                  element={
+                    <RegisterPage
+                      errorMessage={authErrorMessage}
+                      isSubmitting={authOperation === 'register'}
+                      onLoginRequested={() => navigate('/login')}
+                      onRegisterRequested={register}
+                    />
+                  }
+                />
+              }
+            />
+            <Route
+              path="/app"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={authenticated}
+                  element={
+                    authSession.user ? (
+                      <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />
+                    ) : null
+                  }
+                />
+              }
+            />
+            <Route path="*" element={<Navigate to={authenticated ? '/app' : '/login'} replace />} />
+          </Routes>
+        </PageFade>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -115,4 +160,16 @@ function getAuthenticatedRedirectPath(state: unknown) {
 
 function isRouteState(value: unknown): value is RouteState {
   return typeof value === 'object' && value !== null && 'from' in value && typeof value.from === 'string';
+}
+
+function readAuthErrorMessage(error: unknown, fallbackMessage: string) {
+  if (error instanceof Error) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
+
+function getAuthFallbackMessage(operation: Exclude<AuthOperation, null>, t: ReturnType<typeof useLocale>['t']) {
+  return operation === 'login' ? t('auth.login.errorFallback') : t('auth.register.errorFallback');
 }
