@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { BrowserRouter } from 'react-router';
 
 import { App } from './app/App';
 import './index.css';
@@ -11,8 +12,10 @@ applyColorTheme(getStoredColorTheme());
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ColorThemeProvider>
-      <App />
-    </ColorThemeProvider>
+    <BrowserRouter>
+      <ColorThemeProvider>
+        <App />
+      </ColorThemeProvider>
+    </BrowserRouter>
   </StrictMode>,
 );
