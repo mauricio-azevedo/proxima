@@ -66,6 +66,16 @@ export function App() {
     navigate('/login', { replace: true });
   }
 
+  function navigateToLogin() {
+    setAuthErrorMessage(null);
+    navigate('/login');
+  }
+
+  function navigateToRegister() {
+    setAuthErrorMessage(null);
+    navigate('/register');
+  }
+
   return (
     <AnimatePresence mode="wait">
       {isAuthPending ? (
@@ -85,7 +95,7 @@ export function App() {
                       errorMessage={authErrorMessage}
                       isSubmitting={authOperation === 'login'}
                       onLoginRequested={login}
-                      onRegisterRequested={() => navigate('/register')}
+                      onRegisterRequested={navigateToRegister}
                     />
                   }
                 />
@@ -100,7 +110,7 @@ export function App() {
                     <RegisterPage
                       errorMessage={authErrorMessage}
                       isSubmitting={authOperation === 'register'}
-                      onLoginRequested={() => navigate('/login')}
+                      onLoginRequested={navigateToLogin}
                       onRegisterRequested={register}
                     />
                   }
