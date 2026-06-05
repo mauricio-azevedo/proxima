@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { Envelope, Person } from '@gravity-ui/icons';
 import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
@@ -12,19 +10,19 @@ import { useAuthFormField } from '../hooks/use-auth-form-field';
 import type { RegisterRequest } from '../types/register-request';
 
 interface RegisterPageProps {
-  onRegisterRequested: (payload: RegisterRequest) => Promise<void>;
+  errorMessage: string | null;
+  isSubmitting: boolean;
+  onRegisterRequested: (payload: RegisterRequest) => void;
   onLoginRequested: () => void;
 }
 
-export function RegisterPage({ onRegisterRequested, onLoginRequested }: RegisterPageProps) {
+export function RegisterPage({ errorMessage, isSubmitting, onRegisterRequested, onLoginRequested }: RegisterPageProps) {
   const { t } = useLocale();
   const firstName = useAuthFormField('');
   const lastName = useAuthFormField('');
   const nickname = useAuthFormField('');
   const email = useAuthFormField('');
   const password = useAuthFormField('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const isSubmitDisabled =
     isSubmitting ||
     !firstName.value.trim() ||
@@ -33,24 +31,16 @@ export function RegisterPage({ onRegisterRequested, onLoginRequested }: Register
     !email.value.trim() ||
     password.value.length < 6;
 
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
+  function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setErrorMessage(null);
-    setIsSubmitting(true);
 
-    try {
-      await onRegisterRequested({
-        firstName: firstName.value.trim(),
-        lastName: lastName.value.trim(),
-        nickname: nickname.value.trim(),
-        email: email.value.trim(),
-        password: password.value,
-      });
-    } catch (error) {
-      setErrorMessage(readErrorMessage(error, t('auth.register.errorFallback')));
-    } finally {
-      setIsSubmitting(false);
-    }
+    onRegisterRequested({
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      nickname: nickname.value.trim(),
+      email: email.value.trim(),
+      password: password.value,
+    });
   }
 
   return (
@@ -95,12 +85,4 @@ export function RegisterPage({ onRegisterRequested, onLoginRequested }: Register
       </div>
     </main>
   );
-}
-
-function readErrorMessage(error: unknown, fallbackMessage: string) {
-  if (error instanceof Error) {
-    return error.message;
-  }
-
-  return fallbackMessage;
 }
