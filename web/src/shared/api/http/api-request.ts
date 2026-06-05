@@ -8,13 +8,19 @@ interface ApiRequestOptions extends RequestInit {
 
 export async function apiRequest<TResponse>(path: string, options: ApiRequestOptions = {}) {
   const { accessToken, headers, ...requestInit } = options;
+  const requestHeaders = new Headers(headers);
+
+  if (requestInit.body && !requestHeaders.has('Content-Type')) {
+    requestHeaders.set('Content-Type', 'application/json');
+  }
+
+  if (accessToken) {
+    requestHeaders.set('Authorization', `Bearer ${accessToken}`);
+  }
+
   const response = await fetch(`${apiBaseUrl}${path}`, {
     ...requestInit,
-    headers: {
-      ...(requestInit.body ? { 'Content-Type': 'application/json' } : {}),
-      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
-      ...headers,
-    },
+    headers: requestHeaders,
   });
 
   if (!response.ok) {
