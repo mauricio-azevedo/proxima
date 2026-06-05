@@ -24,6 +24,7 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
+          <Separator orientation="vertical" className="h-6" />
           <UserMenu user={user} onLogout={onLogout} />
         </div>
       </header>
