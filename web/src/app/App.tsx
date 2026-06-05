@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 
 import type { LoginRequest } from '../features/auth/types/login-request';
 import type { RegisterRequest } from '../features/auth/types/register-request';
@@ -10,40 +11,90 @@ import { AppShell } from '../shared/layout/AppShell';
 import '../App.css';
 import type { AppTab } from './types/app-tab';
 
-export type AuthScreen = 'login' | 'register';
+interface RouteState {
+  from?: string;
+}
 
 export function App() {
-  const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
   const [activeTab, setActiveTab] = useState<AppTab>('home');
   const authSession = useAuthSession();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   async function login(payload: LoginRequest) {
     await authSession.login(payload);
     setActiveTab('home');
+    navigate(getAuthenticatedRedirectPath(location.state), { replace: true });
   }
 
   async function register(payload: RegisterRequest) {
     await authSession.register(payload);
     setActiveTab('home');
+    navigate('/app', { replace: true });
   }
 
   function logout() {
     authSession.logout();
     setActiveTab('home');
-    setAuthScreen('login');
+    navigate('/login', { replace: true });
   }
 
   if (authSession.status === 'checking') {
     return <AuthSessionLoadingPage />;
   }
 
-  if (authSession.status === 'unauthenticated' || !authSession.user) {
-    if (authScreen === 'register') {
-      return <RegisterPage onLoginRequested={() => setAuthScreen('login')} onRegisterRequested={register} />;
-    }
+  return (
+    <Routes>
+      <Route path="/login" element={<GuestRoute isAuthenticated={isAuthenticated(authSession)} element={<LoginPage onLoginRequested={login} onRegisterRequested={() => navigate('/register')} />} />} />
+      <Route path="/register" element={<GuestRoute isAuthenticated={isAuthenticated(authSession)} element={<RegisterPage onLoginRequested={() => navigate('/login')} onRegisterRequested={register} />} />} />
+      <Route
+        path="/app"
+        element={
+          <ProtectedRoute
+            isAuthenticated={isAuthenticated(authSession)}
+            element={
+              authSession.user ? (
+                <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />
+              ) : null
+            }
+          />
+        }
+      />
+      <Route path="*" element={<Navigate to={isAuthenticated(authSession) ? '/app' : '/login'} replace />} />
+    </Routes>
+  );
+}
 
-    return <LoginPage onLoginRequested={login} onRegisterRequested={() => setAuthScreen('register')} />;
+function ProtectedRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: React.ReactElement | null }) {
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  return <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />;
+  return element;
+}
+
+function GuestRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: React.ReactElement }) {
+  if (isAuthenticated) {
+    return <Navigate to="/app" replace />;
+  }
+
+  return element;
+}
+
+function isAuthenticated(authSession: ReturnType<typeof useAuthSession>) {
+  return authSession.status === 'authenticated' && Boolean(authSession.user);
+}
+
+function getAuthenticatedRedirectPath(state: unknown) {
+  if (isRouteState(state) && state.from) {
+    return state.from;
+  }
+
+  return '/app';
+}
+
+function isRouteState(value: unknown): value is RouteState {
+  return typeof value === 'object' && value !== null && 'from' in value;
 }
