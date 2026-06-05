@@ -16,13 +16,13 @@ export function AuthSessionLoadingPage() {
         </div>
 
         <Card className="auth-card">
-          <Card.Content className="auth-loading-content">
-            <div className="auth-loading-mark" aria-hidden="true">
+          <Card.Content className="grid justify-items-center gap-3 text-center">
+            <div className="grid size-12 place-items-center rounded-2xl bg-muted font-bold" aria-hidden="true">
               P
             </div>
             <Typography.Heading level={1}>{t('app.loading.title')}</Typography.Heading>
             <Typography.Paragraph color="muted">{t('app.loading.description')}</Typography.Paragraph>
-            <div className="auth-loading-bar" aria-hidden="true" />
+            <div className="h-1 w-full rounded-full bg-muted" aria-hidden="true" />
           </Card.Content>
         </Card>
       </div>
