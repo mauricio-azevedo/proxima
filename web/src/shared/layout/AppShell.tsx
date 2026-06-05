@@ -24,7 +24,7 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
-          <Separator orientation="vertical" className="h-6" />
+          <Separator orientation="vertical" className="h-6 self-center" />
           <UserMenu user={user} onLogout={onLogout} />
         </div>
       </header>
@@ -106,7 +106,12 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
         <Separator />
 
         <Dropdown.Menu className="w-full min-w-0">
-          <Dropdown.Item id="logout" textValue={t('menu.signOut')} variant="danger" onClick={onLogout}>
+          <Dropdown.Item
+            id="logout"
+            textValue={t('menu.signOut')}
+            variant="danger"
+            onClick={onLogout}
+          >
             <div className="flex w-full min-w-0 items-center justify-between gap-2">
               <Label>{t('menu.signOut')}</Label>
               <ArrowRightFromSquare className="size-3.5 shrink-0 text-danger" />
