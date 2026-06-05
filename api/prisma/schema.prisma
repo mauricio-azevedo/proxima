@@ -27,8 +27,8 @@ enum PickupGameVisibility {
   PUBLIC
 }
 
-enum PickupGameAdminRole {
-  OWNER
+enum PickupGameUserRole {
+  MEMBER
   ADMIN
 }
 
@@ -63,12 +63,11 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  createdPickupGames      PickupGame[]       @relation("PickupGameCreator")
-  savedPickupGames        PickupGameUser[]
-  administeredPickupGames PickupGameAdmin[]
-  dayListEntries          DayListEntry[]
-  queueEntries            QueueEntry[]
-  matchPlayers            MatchPlayer[]
+  createdPickupGames PickupGame[]     @relation("PickupGameCreator")
+  pickupGameUsers    PickupGameUser[]
+  dayListEntries     DayListEntry[]
+  queueEntries       QueueEntry[]
+  matchPlayers       MatchPlayer[]
 
   scoredGoals  GoalEvent[] @relation("GoalScorer")
   assistedGoals GoalEvent[] @relation("GoalAssistant")
@@ -94,9 +93,8 @@ model PickupGame {
 
   createdBy User @relation("PickupGameCreator", fields: [createdByUserId], references: [id], onDelete: Restrict)
 
-  users  PickupGameUser[]
-  admins PickupGameAdmin[]
-  days   GameDay[]
+  users PickupGameUser[]
+  days  GameDay[]
 
   @@index([createdByUserId])
   @@index([visibility])
@@ -105,9 +103,10 @@ model PickupGame {
 }
 
 model PickupGameUser {
-  id           String @id @default(uuid())
-  pickupGameId String @map("pickup_game_id")
-  userId       String @map("user_id")
+  id           String             @id @default(uuid())
+  pickupGameId String             @map("pickup_game_id")
+  userId       String             @map("user_id")
+  role         PickupGameUserRole @default(MEMBER)
 
   createdAt DateTime @default(now()) @map("created_at")
 
@@ -116,23 +115,8 @@ model PickupGameUser {
 
   @@unique([pickupGameId, userId])
   @@index([userId])
+  @@index([pickupGameId, role])
   @@map("pickup_game_users")
-}
-
-model PickupGameAdmin {
-  id           String              @id @default(uuid())
-  pickupGameId String              @map("pickup_game_id")
-  userId       String              @map("user_id")
-  role         PickupGameAdminRole @default(ADMIN)
-
-  createdAt DateTime @default(now()) @map("created_at")
-
-  pickupGame PickupGame @relation(fields: [pickupGameId], references: [id], onDelete: Cascade)
-  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([pickupGameId, userId])
-  @@index([userId])
-  @@map("pickup_game_admins")
 }
 
 model GameDay {
@@ -231,7 +215,7 @@ model MatchPlayer {
   side    MatchSide
   slot    Int
 
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(now())
 
   match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
   user  User  @relation(fields: [userId], references: [id], onDelete: Restrict)
