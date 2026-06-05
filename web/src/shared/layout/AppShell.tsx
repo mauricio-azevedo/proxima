@@ -3,6 +3,8 @@ import { Avatar, Dropdown, Label, Separator, Tabs } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
+import { LanguageMenuButton } from '../i18n/components/LanguageMenuButton';
+import { useLocale } from '../i18n/hooks/use-locale';
 import { ThemeToggleButton } from '../theme/components/ThemeToggleButton';
 
 interface AppShellProps {
@@ -13,11 +15,14 @@ interface AppShellProps {
 }
 
 export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellProps) {
+  const { t } = useLocale();
+
   return (
     <main className="app-frame">
       <header className="app-header">
-        <h1>{getTabTitle(activeTab)}</h1>
+        <h1>{getTabTitle(activeTab, t)}</h1>
         <div className="app-header-actions">
+          <LanguageMenuButton />
           <ThemeToggleButton />
           <UserMenu user={user} onLogout={onLogout} />
         </div>
@@ -25,22 +30,22 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
 
       <section className="app-content" />
 
-      <nav className="app-dock" aria-label="Navegação principal">
+      <nav className="app-dock" aria-label="Main navigation">
         <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
           <Tabs.ListContainer>
-            <Tabs.List aria-label="Navegação principal">
+            <Tabs.List aria-label="Main navigation">
               <Tabs.Tab id="home">
-                Início
+                {t('app.tabs.home')}
                 <Tabs.Indicator />
               </Tabs.Tab>
 
               <Tabs.Tab id="search">
-                Buscar
+                {t('app.tabs.search')}
                 <Tabs.Indicator />
               </Tabs.Tab>
 
               <Tabs.Tab id="profile">
-                Perfil
+                {t('app.tabs.profile')}
                 <Tabs.Indicator />
               </Tabs.Tab>
             </Tabs.List>
@@ -52,11 +57,12 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
 }
 
 function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void }) {
+  const { t } = useLocale();
   const initials = getInitials(user.name);
 
   return (
     <Dropdown>
-      <Dropdown.Trigger aria-label="Abrir menu do usuário" className="rounded-full">
+      <Dropdown.Trigger aria-label="Open user menu" className="rounded-full">
         <Avatar>
           <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
         </Avatar>
@@ -81,16 +87,16 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
         </div>
 
         <Dropdown.Menu className="w-full min-w-0">
-          <Dropdown.Item id="profile" textValue="Perfil">
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <Label>Perfil</Label>
+          <Dropdown.Item id="profile" textValue={t('menu.profile')}>
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
+              <Label>{t('menu.profile')}</Label>
               <Person className="size-3.5 shrink-0 text-muted" />
             </div>
           </Dropdown.Item>
 
-          <Dropdown.Item id="settings" textValue="Configurações">
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <Label>Configurações</Label>
+          <Dropdown.Item id="settings" textValue={t('menu.settings')}>
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
+              <Label>{t('menu.settings')}</Label>
               <Gear className="size-3.5 shrink-0 text-muted" />
             </div>
           </Dropdown.Item>
@@ -99,9 +105,9 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
         <Separator />
 
         <Dropdown.Menu className="w-full min-w-0">
-          <Dropdown.Item id="logout" textValue="Sair" variant="danger" onClick={onLogout}>
-            <div className="flex min-w-0 items-center justify-between gap-2">
-              <Label>Sair</Label>
+          <Dropdown.Item id="logout" textValue={t('menu.signOut')} variant="danger" onClick={onLogout}>
+            <div className="flex w-full min-w-0 items-center justify-between gap-2">
+              <Label>{t('menu.signOut')}</Label>
               <ArrowRightFromSquare className="size-3.5 shrink-0 text-danger" />
             </div>
           </Dropdown.Item>
@@ -111,10 +117,10 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
   );
 }
 
-function getTabTitle(tab: AppTab): string {
-  if (tab === 'search') return 'Buscar';
-  if (tab === 'profile') return 'Perfil';
-  return 'Início';
+function getTabTitle(tab: AppTab, t: ReturnType<typeof useLocale>['t']): string {
+  if (tab === 'search') return t('app.tabs.search');
+  if (tab === 'profile') return t('app.tabs.profile');
+  return t('app.tabs.home');
 }
 
 function getInitials(name: string): string {
