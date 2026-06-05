@@ -30,10 +30,10 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
 
       <section className="app-content" />
 
-      <nav className="app-dock" aria-label="Main navigation">
+      <nav className="app-dock" aria-label={t('app.navigation.main')}>
         <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
           <Tabs.ListContainer>
-            <Tabs.List aria-label="Main navigation">
+            <Tabs.List aria-label={t('app.navigation.main')}>
               <Tabs.Tab id="home">
                 {t('app.tabs.home')}
                 <Tabs.Indicator />
@@ -62,7 +62,7 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
 
   return (
     <Dropdown>
-      <Dropdown.Trigger aria-label="Open user menu" className="rounded-full">
+      <Dropdown.Trigger aria-label={t('menu.user.open')} className="rounded-full">
         <Avatar>
           <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
         </Avatar>
