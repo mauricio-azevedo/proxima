@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { Envelope } from '@gravity-ui/icons';
 import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
+import { LanguageMenuButton } from '../../../shared/i18n/components/LanguageMenuButton';
+import { useLocale } from '../../../shared/i18n/hooks/use-locale';
 import { ThemeToggleButton } from '../../../shared/theme/components/ThemeToggleButton';
 import { AuthPasswordInput } from '../components/AuthPasswordInput';
 import { AuthTextInput } from '../components/AuthTextInput';
@@ -15,6 +17,7 @@ interface LoginPageProps {
 }
 
 export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPageProps) {
+  const { t } = useLocale();
   const email = useAuthFormField('');
   const password = useAuthFormField('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -32,7 +35,7 @@ export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPagePr
         password: password.value,
       });
     } catch (error) {
-      setErrorMessage(getErrorMessage(error));
+      setErrorMessage(readErrorMessage(error, t('auth.login.errorFallback')));
     } finally {
       setIsSubmitting(false);
     }
@@ -42,20 +45,21 @@ export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPagePr
     <main className="auth-screen">
       <div className="auth-shell">
         <div className="auth-theme-switch">
+          <LanguageMenuButton />
           <ThemeToggleButton />
         </div>
 
         <Card className="auth-card">
-          <Form aria-label="Login" className="auth-form" onSubmit={submit}>
+          <Form aria-label={t('auth.login')} className="auth-form" onSubmit={submit}>
             <Card.Header>
-              <Typography.Heading level={1}>Login</Typography.Heading>
+              <Typography.Heading level={1}>{t('auth.login')}</Typography.Heading>
             </Card.Header>
 
             <Card.Content className="auth-fields">
               <AuthTextInput
                 autoComplete="email"
                 icon={Envelope}
-                label="Email"
+                label={t('auth.email')}
                 name="email"
                 type="email"
                 value={email.value}
@@ -72,11 +76,11 @@ export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPagePr
 
             <Card.Footer className="auth-actions">
               <Button type="submit" variant="primary" fullWidth isDisabled={isSubmitDisabled}>
-                {isSubmitting ? 'Entrando...' : 'Entrar'}
+                {isSubmitting ? t('auth.login.loading') : t('auth.login.action')}
               </Button>
 
               <Typography.Paragraph size="sm" color="muted">
-                Não tem conta? <Link onPress={onRegisterRequested}>Criar conta</Link>
+                {t('auth.switchToRegister')} <Link onPress={onRegisterRequested}>{t('auth.switchToRegister.action')}</Link>
               </Typography.Paragraph>
             </Card.Footer>
           </Form>
@@ -86,10 +90,10 @@ export function LoginPage({ onLoginRequested, onRegisterRequested }: LoginPagePr
   );
 }
 
-function getErrorMessage(error: unknown) {
+function readErrorMessage(error: unknown, fallbackMessage: string) {
   if (error instanceof Error) {
     return error.message;
   }
 
-  return 'Não foi possível entrar. Tente novamente.';
+  return fallbackMessage;
 }
