@@ -3,6 +3,7 @@ import { Avatar, Dropdown, Label, Separator, Tabs } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
+import { ThemeSwitch } from '../theme/components/ThemeSwitch';
 
 interface AppShellProps {
   activeTab: AppTab;
@@ -16,7 +17,10 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
     <main className="app-frame">
       <header className="app-header">
         <h1>{getTabTitle(activeTab)}</h1>
-        <UserMenu user={user} onLogout={onLogout} />
+        <div className="app-header-actions">
+          <ThemeSwitch />
+          <UserMenu user={user} onLogout={onLogout} />
+        </div>
       </header>
 
       <section className="app-content" />
@@ -59,15 +63,19 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
       </Dropdown.Trigger>
 
       <Dropdown.Popover>
-        <div className="px-3 pt-3 pb-1">
-          <div className="flex items-center gap-2">
+        <div className="w-64 px-3 pt-3 pb-1">
+          <div className="flex min-w-0 items-center gap-2">
             <Avatar size="sm">
               <Avatar.Fallback delayMs={600}>{initials}</Avatar.Fallback>
             </Avatar>
 
-            <div className="flex flex-col gap-0">
-              <p className="text-sm leading-5 font-medium">{user.name}</p>
-              <p className="text-xs leading-none text-muted">{user.email}</p>
+            <div className="flex min-w-0 flex-col gap-0">
+              <p className="truncate text-sm leading-5 font-medium" title={user.name}>
+                {user.name}
+              </p>
+              <p className="truncate text-xs leading-none text-muted" title={user.email}>
+                {user.email}
+              </p>
             </div>
           </div>
         </div>
