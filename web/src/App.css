@@ -12,6 +12,7 @@
 .auth-theme-switch {
   display: flex;
   justify-content: flex-end;
+  gap: 0.5rem;
   margin-bottom: 1rem;
 }
 
@@ -37,11 +38,6 @@
   padding-top: 1.25rem;
 }
 
-.auth-loading-content {
-  display: grid;
-  gap: 0.5rem;
-}
-
 .app-frame {
   min-height: 100svh;
   display: flex;
@@ -65,7 +61,7 @@
 .app-header-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .app-content {
