@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactElement } from 'react';
 import { Navigate, Route, Routes, useLocation, useNavigate } from 'react-router';
 
 import type { LoginRequest } from '../features/auth/types/login-request';
@@ -43,15 +43,33 @@ export function App() {
     return <AuthSessionLoadingPage />;
   }
 
+  const authenticated = isAuthenticated(authSession);
+
   return (
     <Routes>
-      <Route path="/login" element={<GuestRoute isAuthenticated={isAuthenticated(authSession)} element={<LoginPage onLoginRequested={login} onRegisterRequested={() => navigate('/register')} />} />} />
-      <Route path="/register" element={<GuestRoute isAuthenticated={isAuthenticated(authSession)} element={<RegisterPage onLoginRequested={() => navigate('/login')} onRegisterRequested={register} />} />} />
+      <Route
+        path="/login"
+        element={
+          <GuestRoute
+            isAuthenticated={authenticated}
+            element={<LoginPage onLoginRequested={login} onRegisterRequested={() => navigate('/register')} />}
+          />
+        }
+      />
+      <Route
+        path="/register"
+        element={
+          <GuestRoute
+            isAuthenticated={authenticated}
+            element={<RegisterPage onLoginRequested={() => navigate('/login')} onRegisterRequested={register} />}
+          />
+        }
+      />
       <Route
         path="/app"
         element={
           <ProtectedRoute
-            isAuthenticated={isAuthenticated(authSession)}
+            isAuthenticated={authenticated}
             element={
               authSession.user ? (
                 <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />
@@ -60,12 +78,12 @@ export function App() {
           />
         }
       />
-      <Route path="*" element={<Navigate to={isAuthenticated(authSession) ? '/app' : '/login'} replace />} />
+      <Route path="*" element={<Navigate to={authenticated ? '/app' : '/login'} replace />} />
     </Routes>
   );
 }
 
-function ProtectedRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: React.ReactElement | null }) {
+function ProtectedRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: ReactElement | null }) {
   const location = useLocation();
 
   if (!isAuthenticated) {
@@ -75,7 +93,7 @@ function ProtectedRoute({ isAuthenticated, element }: { isAuthenticated: boolean
   return element;
 }
 
-function GuestRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: React.ReactElement }) {
+function GuestRoute({ isAuthenticated, element }: { isAuthenticated: boolean; element: ReactElement }) {
   if (isAuthenticated) {
     return <Navigate to="/app" replace />;
   }
@@ -96,5 +114,5 @@ function getAuthenticatedRedirectPath(state: unknown) {
 }
 
 function isRouteState(value: unknown): value is RouteState {
-  return typeof value === 'object' && value !== null && 'from' in value;
+  return typeof value === 'object' && value !== null && 'from' in value && typeof value.from === 'string';
 }
