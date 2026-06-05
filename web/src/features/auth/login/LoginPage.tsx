@@ -2,7 +2,7 @@ import { Envelope } from '@gravity-ui/icons';
 import { Button, Card, Form, Link, Typography } from '@heroui/react';
 
 import type { UserSession } from '../../../app/types/user-session';
-import { ThemeSwitch } from '../../../shared/theme/components/ThemeSwitch';
+import { ThemeToggleButton } from '../../../shared/theme/components/ThemeToggleButton';
 import { AuthPasswordInput } from '../components/AuthPasswordInput';
 import { AuthTextInput } from '../components/AuthTextInput';
 import { defaultUserSession } from '../constants/default-user-session';
@@ -29,7 +29,7 @@ export function LoginPage({ onLoggedIn, onRegisterRequested }: LoginPageProps) {
     <main className="auth-screen">
       <div className="auth-shell">
         <div className="auth-theme-switch">
-          <ThemeSwitch />
+          <ThemeToggleButton />
         </div>
 
         <Card className="auth-card">
