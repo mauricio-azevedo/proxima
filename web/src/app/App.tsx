@@ -174,7 +174,7 @@ export function App() {
                         onTabChange={changeTab}
                         onLogout={logout}
                       >
-                        <CreatePickupGamePage onCancel={navigateToHome} onCreated={navigateToHome} />
+                        <CreatePickupGamePage onCreated={navigateToHome} />
                       </AppShell>
                     ) : null
                   }
