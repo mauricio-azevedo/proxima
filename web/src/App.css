@@ -98,11 +98,20 @@
   background: canvas;
 }
 
+.pickup-games-home,
+.create-pickup-game-page {
+  width: min(100%, 42rem);
+  margin: 0 auto;
+}
+
 .pickup-games-home {
   display: grid;
   gap: 1.5rem;
-  width: min(100%, 42rem);
-  margin: 0 auto;
+}
+
+.pickup-games-primary-action {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .pickup-games-section {
@@ -123,5 +132,33 @@
 
 .pickup-games-list {
   display: grid;
+  gap: 0.75rem;
+}
+
+.create-pickup-game-form,
+.create-pickup-game-fields,
+.create-pickup-game-actions {
+  width: 100%;
+}
+
+.create-pickup-game-fields {
+  display: grid;
+  gap: 1rem;
+}
+
+.create-pickup-game-choice-group {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.create-pickup-game-choice-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.create-pickup-game-actions {
+  display: flex;
+  justify-content: flex-end;
   gap: 0.75rem;
 }
