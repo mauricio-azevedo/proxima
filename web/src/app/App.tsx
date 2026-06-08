@@ -9,12 +9,13 @@ import { AuthSessionLoadingPage } from '../features/auth/session/AuthSessionLoad
 import type { AuthOperation } from '../features/auth/types/auth-operation';
 import type { LoginRequest } from '../features/auth/types/login-request';
 import type { RegisterRequest } from '../features/auth/types/register-request';
-import { CreatePickupGamePage } from '../features/pickup-games/CreatePickupGamePage';
+import { CreatePickupGameDrawer } from '../features/pickup-games/CreatePickupGameDrawer';
 import { useLocale } from '../shared/i18n/hooks/use-locale';
 import { AppShell } from '../shared/layout/AppShell';
 import { PageFade } from '../shared/ui/PageFade';
 import '../App.css';
 import type { AppTab } from './types/app-tab';
+import type { UserSession } from './types/user-session';
 
 interface RouteState {
   from?: string;
@@ -102,7 +103,7 @@ export function App() {
           <AuthSessionLoadingPage />
         </PageFade>
       ) : (
-        <PageFade key={location.pathname}>
+        <PageFade key={getPageFadeKey(location.pathname)}>
           <Routes location={location}>
             <Route
               path="/login"
@@ -137,45 +138,21 @@ export function App() {
               }
             />
             <Route
-              path="/app"
+              path="/app/*"
               element={
                 <ProtectedRoute
                   isAuthenticated={authenticated}
                   element={
                     authSession.user ? (
-                      <AppShell
+                      <AuthenticatedApp
                         activeTab={activeTab}
                         user={authSession.user}
                         onCreatePickupGameRequested={navigateToCreatePickupGame}
                         onTabChange={changeTab}
                         onLogout={logout}
+                        onCreateDrawerClosed={navigateToHome}
+                        onPickupGameCreated={navigateToHome}
                       />
-                    ) : null
-                  }
-                />
-              }
-            />
-            <Route
-              path="/app/pickup-games/new"
-              element={
-                <ProtectedRoute
-                  isAuthenticated={authenticated}
-                  element={
-                    authSession.user ? (
-                      <AppShell
-                        activeTab="home"
-                        headerVariant="compact"
-                        showDock={false}
-                        showLiveBar={false}
-                        title={t('pickupGames.create.shellTitle')}
-                        user={authSession.user}
-                        onBack={navigateToHome}
-                        onCreatePickupGameRequested={navigateToCreatePickupGame}
-                        onTabChange={changeTab}
-                        onLogout={logout}
-                      >
-                        <CreatePickupGamePage onCreated={navigateToHome} />
-                      </AppShell>
                     ) : null
                   }
                 />
@@ -186,6 +163,44 @@ export function App() {
         </PageFade>
       )}
     </AnimatePresence>
+  );
+}
+
+function AuthenticatedApp({
+  activeTab,
+  user,
+  onCreatePickupGameRequested,
+  onTabChange,
+  onLogout,
+  onCreateDrawerClosed,
+  onPickupGameCreated,
+}: {
+  activeTab: AppTab;
+  user: UserSession;
+  onCreatePickupGameRequested: () => void;
+  onTabChange: (tab: AppTab) => void;
+  onLogout: () => void;
+  onCreateDrawerClosed: () => void;
+  onPickupGameCreated: () => void;
+}) {
+  const location = useLocation();
+  const isCreatePickupGameRoute = location.pathname === '/app/pickup-games/new';
+
+  if (location.pathname !== '/app' && !isCreatePickupGameRoute) {
+    return <Navigate to="/app" replace />;
+  }
+
+  return (
+    <>
+      <AppShell
+        activeTab={activeTab}
+        user={user}
+        onCreatePickupGameRequested={onCreatePickupGameRequested}
+        onTabChange={onTabChange}
+        onLogout={onLogout}
+      />
+      <CreatePickupGameDrawer isOpen={isCreatePickupGameRoute} onClose={onCreateDrawerClosed} onCreated={onPickupGameCreated} />
+    </>
   );
 }
 
@@ -233,4 +248,8 @@ function readAuthErrorMessage(error: unknown, fallbackMessage: string) {
 
 function getAuthFallbackMessage(operation: Exclude<AuthOperation, null>, t: ReturnType<typeof useLocale>['t']) {
   return operation === 'login' ? t('auth.login.errorFallback') : t('auth.register.errorFallback');
+}
+
+function getPageFadeKey(pathname: string) {
+  return pathname.startsWith('/app') ? 'app' : pathname;
 }

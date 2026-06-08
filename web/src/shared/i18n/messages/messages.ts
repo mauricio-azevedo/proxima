@@ -100,6 +100,13 @@ export const messages = {
     'weekday.THURSDAY': 'Thursday',
     'weekday.TUESDAY': 'Tuesday',
     'weekday.WEDNESDAY': 'Wednesday',
+    'weekday.compact.FRIDAY': 'F',
+    'weekday.compact.MONDAY': 'M',
+    'weekday.compact.SATURDAY': 'S',
+    'weekday.compact.SUNDAY': 'S',
+    'weekday.compact.THURSDAY': 'T',
+    'weekday.compact.TUESDAY': 'T',
+    'weekday.compact.WEDNESDAY': 'W',
   },
   'pt-BR': {
     'app.loading.description': 'Estamos restaurando sua sessão com segurança.',
@@ -202,6 +209,13 @@ export const messages = {
     'weekday.THURSDAY': 'Quinta',
     'weekday.TUESDAY': 'Terça',
     'weekday.WEDNESDAY': 'Quarta',
+    'weekday.compact.FRIDAY': 'S',
+    'weekday.compact.MONDAY': 'S',
+    'weekday.compact.SATURDAY': 'S',
+    'weekday.compact.SUNDAY': 'D',
+    'weekday.compact.THURSDAY': 'Q',
+    'weekday.compact.TUESDAY': 'T',
+    'weekday.compact.WEDNESDAY': 'Q',
   },
 } as const;
 
