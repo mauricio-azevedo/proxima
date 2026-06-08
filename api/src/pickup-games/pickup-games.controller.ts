@@ -18,6 +18,7 @@ import type { FinishMatchDto } from './dto/finish-match.dto';
 import type { UpdateGameDayTeamSizeDto } from './dto/update-game-day-team-size.dto';
 import type { UpdateMatchGoalDto } from './dto/update-match-goal.dto';
 import { GameDaysService } from './game-days.service';
+import { PickupGamesHomeService } from './pickup-games-home.service';
 import { PickupGamesService } from './pickup-games.service';
 
 @Controller('pickup-games')
@@ -25,12 +26,18 @@ import { PickupGamesService } from './pickup-games.service';
 export class PickupGamesController {
   constructor(
     private readonly pickupGamesService: PickupGamesService,
+    private readonly pickupGamesHomeService: PickupGamesHomeService,
     private readonly gameDaysService: GameDaysService,
   ) {}
 
   @Get()
   findAll(@Req() request: AuthenticatedRequest) {
     return this.pickupGamesService.findAll(request.user.id);
+  }
+
+  @Get('home')
+  getHome(@Req() request: AuthenticatedRequest) {
+    return this.pickupGamesHomeService.getHome(request.user.id);
   }
 
   @Post()
