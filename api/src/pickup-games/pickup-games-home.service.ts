@@ -9,11 +9,17 @@ import {
 } from '../../generated/prisma';
 import { PrismaService } from '../database/prisma.service';
 
-type PickupGameHomeOperationalState = 'waiting_for_players' | 'ready_to_start' | 'playing' | null;
-type PickupGameHomeViewerState = 'not_arrived' | 'inside_first_match' | 'next_team' | 'playing' | null;
-type PickupGameHomePrimaryAction = 'arrive' | 'start_match' | 'open' | null;
+export type PickupGameHomeOperationalState = 'waiting_for_players' | 'ready_to_start' | 'playing' | null;
+export type PickupGameHomeViewerState = 'not_arrived' | 'inside_first_match' | 'next_team' | 'playing' | null;
+export type PickupGameHomePrimaryAction = 'arrive' | 'start_match' | 'open' | null;
 
-interface PickupGameHomeItem {
+export interface PickupGamesHomeResponse {
+  activePickupGame: PickupGameHomeItem | null;
+  myPickupGames: PickupGameHomeItem[];
+  discoverPickupGames: PickupGameHomeItem[];
+}
+
+export interface PickupGameHomeItem {
   id: string;
   name: string;
   locationName: string | null;
@@ -26,7 +32,7 @@ interface PickupGameHomeItem {
   nextGameDay: PickupGameHomeDay | null;
 }
 
-interface PickupGameHomeDay {
+export interface PickupGameHomeDay {
   id: string;
   date: Date;
   status: GameDayStatus;
@@ -43,7 +49,7 @@ interface PickupGameHomeDay {
   currentMatch: PickupGameHomeCurrentMatch | null;
 }
 
-interface PickupGameHomeCurrentMatch {
+export interface PickupGameHomeCurrentMatch {
   id: string;
   number: number;
   teamSize: number;
@@ -58,7 +64,7 @@ interface PickupGameHomeCurrentMatch {
 export class PickupGamesHomeService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getHome(userId: string) {
+  async getHome(userId: string): Promise<PickupGamesHomeResponse> {
     const pickupGames = await this.prisma.pickupGame.findMany({
       where: {
         OR: [
