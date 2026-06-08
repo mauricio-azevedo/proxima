@@ -141,6 +141,23 @@
   border-radius: 1.5rem 1.5rem 0 0;
 }
 
+.create-pickup-game-drawer-form {
+  width: 100%;
+  display: grid;
+  gap: 1.125rem;
+}
+
+.create-pickup-game-weekday-list {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.create-pickup-game-weekday-list .create-pickup-game-choice-button {
+  width: 100%;
+  min-width: 0;
+  padding-inline: 0;
+}
+
 .pickup-games-home {
   display: grid;
   gap: 1.5rem;
