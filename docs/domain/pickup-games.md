@@ -47,7 +47,14 @@ Membership in a `PickupGame` does not imply presence on any specific `GameDay`.
 
 ### QueueEntry
 
-A `QueueEntry` represents a user's queue position for a specific `GameDay`.
+A `QueueEntry` represents a user's operational queue position for a specific `GameDay`.
+
+In product language, the queue drives labels such as:
+
+- `Você tá dentro`
+- `Você é 1ª`
+- `Você é 2ª`
+- `Você é 3ª`
 
 ### Match
 
@@ -111,6 +118,106 @@ Recommended recovery policy:
 Automatic promotion must be treated as a recovery mechanism, not normal product behavior.
 
 Recovery flows should be auditable.
+
+## Home listing contract
+
+The home screen is not a raw pickup-game list. It is a product view model optimized for the user's current situation.
+
+Endpoint:
+
+```txt
+GET /pickup-games/home
+```
+
+Response shape:
+
+```ts
+interface PickupGamesHomeResponse {
+  activePickupGame: PickupGameHomeItem | null;
+  myPickupGames: PickupGameHomeItem[];
+  discoverPickupGames: PickupGameHomeItem[];
+}
+```
+
+### activePickupGame
+
+`activePickupGame` is the user's most relevant operational pickup game, if any.
+
+It only includes pickup games the user belongs to.
+
+A pickup game is operationally active when its next `GameDay` has one of these derived states:
+
+- `waiting_for_players`
+- `ready_to_start`
+- `playing`
+
+The API returns at most one `activePickupGame` so the client can render one persistent live bar above the bottom dock.
+
+### myPickupGames
+
+`myPickupGames` contains pickup games where the viewer has a `PickupGameUser` membership, excluding the selected `activePickupGame`.
+
+This powers the `Suas peladas` section.
+
+### discoverPickupGames
+
+`discoverPickupGames` contains public pickup games where the viewer is not a member.
+
+This powers the `Outras peladas` section.
+
+### Operational state
+
+`operationalState` is derived for UI purposes. It is not currently persisted as a separate database enum.
+
+Rules:
+
+- `GameDayStatus.PLAYING` -> `playing`
+- `GameDayStatus.WAITING_FOR_PLAYERS` and active queue count is less than `teamSize * 2` -> `waiting_for_players`
+- `GameDayStatus.WAITING_FOR_PLAYERS` and active queue count is at least `teamSize * 2` -> `ready_to_start`
+- other statuses -> `null`
+
+### Viewer state
+
+`viewerState` describes the viewer's operational position for the live bar.
+
+Values:
+
+- `not_arrived`: user is not in the active queue.
+- `inside_first_match`: before the first match starts, the user is inside the first match capacity.
+- `next_team`: user is waiting in a later team.
+- `playing`: user is in the current running match.
+
+Product labels are derived from these states:
+
+- `not_arrived` + `waiting_for_players` or `ready_to_start` -> `Cheguei`
+- `inside_first_match` -> `Você tá dentro`
+- `next_team` + `viewerTeamQueueNumber = 1` -> `Você é 1ª`
+- `next_team` + `viewerTeamQueueNumber = 2` -> `Você é 2ª`
+- `next_team` + `viewerTeamQueueNumber = 3` -> `Você é 3ª`
+- `playing` -> `Jogando`
+
+### Pegar Nª
+
+When a match is already playing and the viewer is not in the queue, the home view model returns `viewerProspectiveTeamQueueNumber`.
+
+The client should use it to render labels such as:
+
+- `Pegar 1ª`
+- `Pegar 2ª`
+- `Pegar 3ª`
+
+This tells the user what queue team they will join before they take the action.
+
+### Primary action
+
+`primaryAction` tells the client what action should be offered from the live bar:
+
+- `arrive`: create or reuse the day list entry and create a queue entry.
+- `start_match`: admin can start the first match.
+- `open`: open the pickup game operational screen.
+- `null`: no primary live-bar action.
+
+The client should not infer these actions from raw counts and statuses.
 
 ## Acceptance criteria
 
