@@ -86,16 +86,6 @@
   line-height: 1;
 }
 
-.app-header-create-button {
-  width: 2.25rem;
-  min-width: 2.25rem;
-  height: 2.25rem;
-  padding: 0;
-  border-radius: 999rem;
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
 .app-header-actions {
   display: flex;
   flex-shrink: 0;
@@ -141,18 +131,6 @@
 
 .pickup-games-home,
 .create-pickup-game-page {
-  width: min(100%, 42rem);
-  margin: 0 auto;
-}
-
-.create-pickup-game-fullscreen-overlay .create-pickup-game-page {
-  min-height: 100svh;
-  display: grid;
-  align-items: start;
-  padding: 1rem;
-}
-
-.create-pickup-game-fullscreen-overlay .create-pickup-game-page > .w-full {
   width: min(100%, 42rem);
   margin: 0 auto;
 }
