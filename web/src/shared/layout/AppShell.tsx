@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { ArrowRightFromSquare, Gear, Person } from '@gravity-ui/icons';
 import { Avatar, Card, Dropdown, Label, Separator, Tabs, Typography } from '@heroui/react';
 
@@ -13,11 +15,22 @@ import { ThemeToggleButton } from '../theme/components/ThemeToggleButton';
 interface AppShellProps {
   activeTab: AppTab;
   user: UserSession;
+  children?: ReactNode;
+  title?: string;
+  onCreatePickupGameRequested?: () => void;
   onTabChange: (tab: AppTab) => void;
   onLogout: () => void;
 }
 
-export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellProps) {
+export function AppShell({
+  activeTab,
+  user,
+  children,
+  title,
+  onCreatePickupGameRequested,
+  onTabChange,
+  onLogout,
+}: AppShellProps) {
   const { t } = useLocale();
   const pickupGamesHome = usePickupGamesHome();
   const activePickupGame = pickupGamesHome.data?.activePickupGame ?? null;
@@ -25,7 +38,7 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
   return (
     <main className="app-frame">
       <header className="app-header">
-        <Typography.Heading level={1}>{getTabTitle(activeTab, t)}</Typography.Heading>
+        <Typography.Heading level={1}>{title ?? getTabTitle(activeTab, t)}</Typography.Heading>
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
@@ -34,7 +47,9 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
         </div>
       </header>
 
-      <section className="app-content">{renderActiveTab(activeTab, pickupGamesHome)}</section>
+      <section className="app-content">
+        {children ?? renderActiveTab(activeTab, pickupGamesHome, onCreatePickupGameRequested)}
+      </section>
 
       {activePickupGame ? (
         <div className="app-live-bar">
@@ -68,13 +83,18 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
   );
 }
 
-function renderActiveTab(activeTab: AppTab, pickupGamesHome: ReturnType<typeof usePickupGamesHome>) {
+function renderActiveTab(
+  activeTab: AppTab,
+  pickupGamesHome: ReturnType<typeof usePickupGamesHome>,
+  onCreatePickupGameRequested: (() => void) | undefined,
+) {
   if (activeTab === 'home') {
     return (
       <PickupGamesHomePage
         data={pickupGamesHome.data}
         errorMessage={pickupGamesHome.errorMessage}
         status={pickupGamesHome.status}
+        onCreatePickupGameRequested={onCreatePickupGameRequested}
       />
     );
   }
