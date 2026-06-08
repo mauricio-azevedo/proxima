@@ -9,6 +9,7 @@ import { AuthSessionLoadingPage } from '../features/auth/session/AuthSessionLoad
 import type { AuthOperation } from '../features/auth/types/auth-operation';
 import type { LoginRequest } from '../features/auth/types/login-request';
 import type { RegisterRequest } from '../features/auth/types/register-request';
+import { CreatePickupGamePage } from '../features/pickup-games/CreatePickupGamePage';
 import { useLocale } from '../shared/i18n/hooks/use-locale';
 import { AppShell } from '../shared/layout/AppShell';
 import { PageFade } from '../shared/ui/PageFade';
@@ -76,6 +77,24 @@ export function App() {
     navigate('/register');
   }
 
+  function navigateToCreatePickupGame() {
+    setActiveTab('home');
+    navigate('/app/pickup-games/new');
+  }
+
+  function navigateToHome() {
+    setActiveTab('home');
+    navigate('/app');
+  }
+
+  function changeTab(tab: AppTab) {
+    setActiveTab(tab);
+
+    if (location.pathname !== '/app') {
+      navigate('/app');
+    }
+  }
+
   return (
     <AnimatePresence mode="wait">
       {isAuthPending ? (
@@ -124,7 +143,35 @@ export function App() {
                   isAuthenticated={authenticated}
                   element={
                     authSession.user ? (
-                      <AppShell activeTab={activeTab} user={authSession.user} onTabChange={setActiveTab} onLogout={logout} />
+                      <AppShell
+                        activeTab={activeTab}
+                        user={authSession.user}
+                        onCreatePickupGameRequested={navigateToCreatePickupGame}
+                        onTabChange={changeTab}
+                        onLogout={logout}
+                      />
+                    ) : null
+                  }
+                />
+              }
+            />
+            <Route
+              path="/app/pickup-games/new"
+              element={
+                <ProtectedRoute
+                  isAuthenticated={authenticated}
+                  element={
+                    authSession.user ? (
+                      <AppShell
+                        activeTab="home"
+                        title={t('pickupGames.create.title')}
+                        user={authSession.user}
+                        onCreatePickupGameRequested={navigateToCreatePickupGame}
+                        onTabChange={changeTab}
+                        onLogout={logout}
+                      >
+                        <CreatePickupGamePage onCancel={navigateToHome} onCreated={navigateToHome} />
+                      </AppShell>
                     ) : null
                   }
                 />
