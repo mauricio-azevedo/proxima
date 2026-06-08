@@ -169,6 +169,7 @@ export function App() {
                         showLiveBar={false}
                         title={t('pickupGames.create.shellTitle')}
                         user={authSession.user}
+                        onBack={navigateToHome}
                         onCreatePickupGameRequested={navigateToCreatePickupGame}
                         onTabChange={changeTab}
                         onLogout={logout}
