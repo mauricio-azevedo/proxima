@@ -51,7 +51,10 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
     if (isOpen) {
       isClosingRef.current = false;
       setIsDrawerOpen(true);
+      return;
     }
+
+    setIsDrawerOpen(false);
   }, [isOpen]);
 
   useEffect(() => {
