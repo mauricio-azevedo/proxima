@@ -164,7 +164,10 @@ export function App() {
                     authSession.user ? (
                       <AppShell
                         activeTab="home"
-                        title={t('pickupGames.create.title')}
+                        headerVariant="compact"
+                        showDock={false}
+                        showLiveBar={false}
+                        title={t('pickupGames.create.shellTitle')}
                         user={authSession.user}
                         onCreatePickupGameRequested={navigateToCreatePickupGame}
                         onTabChange={changeTab}
