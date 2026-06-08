@@ -131,32 +131,19 @@ export function CreatePickupGamePage({ onCancel, onCreated }: CreatePickupGamePa
 
             <ChoiceGroup label={t('pickupGames.create.weekday')} isRequired>
               {WEEKDAYS.map((option) => (
-                <Button
-                  key={option}
-                  type="button"
-                  variant={weekday === option ? 'primary' : undefined}
-                  onClick={() => setWeekday(option)}
-                >
+                <ChoiceButton key={option} isSelected={weekday === option} onPress={() => setWeekday(option)}>
                   {t(getWeekdayMessageId(option))}
-                </Button>
+                </ChoiceButton>
               ))}
             </ChoiceGroup>
 
             <ChoiceGroup label={t('pickupGames.create.visibility')} isRequired>
-              <Button
-                type="button"
-                variant={visibility === 'PRIVATE' ? 'primary' : undefined}
-                onClick={() => setVisibility('PRIVATE')}
-              >
+              <ChoiceButton isSelected={visibility === 'PRIVATE'} onPress={() => setVisibility('PRIVATE')}>
                 {t('pickupGames.create.visibilityPrivate')}
-              </Button>
-              <Button
-                type="button"
-                variant={visibility === 'PUBLIC' ? 'primary' : undefined}
-                onClick={() => setVisibility('PUBLIC')}
-              >
+              </ChoiceButton>
+              <ChoiceButton isSelected={visibility === 'PUBLIC'} onPress={() => setVisibility('PUBLIC')}>
                 {t('pickupGames.create.visibilityPublic')}
-              </Button>
+              </ChoiceButton>
             </ChoiceGroup>
 
             {errorMessage ? (
@@ -214,6 +201,19 @@ function ChoiceGroup({ children, label, isRequired }: { children: React.ReactNod
       </Label>
       <div className="create-pickup-game-choice-list">{children}</div>
     </div>
+  );
+}
+
+function ChoiceButton({ children, isSelected, onPress }: { children: React.ReactNode; isSelected: boolean; onPress: () => void }) {
+  return (
+    <Button
+      type="button"
+      variant={isSelected ? 'primary' : undefined}
+      className={isSelected ? 'create-pickup-game-choice-button is-selected' : 'create-pickup-game-choice-button'}
+      onClick={onPress}
+    >
+      {children}
+    </Button>
   );
 }
 
