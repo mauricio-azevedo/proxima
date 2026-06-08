@@ -30,12 +30,12 @@ export function LivePickupGameBar({ pickupGame }: LivePickupGameBarProps) {
             <Typography.Paragraph className="truncate font-medium">
               {getMainLabel(pickupGame, t)}
             </Typography.Paragraph>
-            <Typography.Paragraph size="xs" color="muted">
+            <Typography.Paragraph size="sm" color="muted">
               {getSecondaryLabel(pickupGame, t)}
             </Typography.Paragraph>
           </div>
 
-          <Button size="sm" variant={gameDay.primaryAction === 'start_match' ? 'primary' : 'secondary'}>
+          <Button size="sm" variant={gameDay.primaryAction === 'start_match' ? 'primary' : undefined}>
             {getActionLabel(pickupGame, t)}
           </Button>
         </div>
