@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 
 import { ArrowRightFromSquare, Gear, Person } from '@gravity-ui/icons';
-import { Avatar, Card, Dropdown, Label, Separator, Tabs, Typography } from '@heroui/react';
+import { Avatar, Button, Card, Dropdown, Label, Separator, Tabs, Typography } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
@@ -20,6 +20,7 @@ interface AppShellProps {
   showDock?: boolean;
   showLiveBar?: boolean;
   title?: string;
+  onBack?: () => void;
   onCreatePickupGameRequested?: () => void;
   onTabChange: (tab: AppTab) => void;
   onLogout: () => void;
@@ -33,6 +34,7 @@ export function AppShell({
   showDock = true,
   showLiveBar = true,
   title,
+  onBack,
   onCreatePickupGameRequested,
   onTabChange,
   onLogout,
@@ -45,7 +47,15 @@ export function AppShell({
   return (
     <main className="app-frame">
       <header className={`app-header app-header--${headerVariant}`}>
-        <Typography.Heading level={headerVariant === 'compact' ? 2 : 1}>{headerTitle}</Typography.Heading>
+        <div className="app-header-title-group">
+          {onBack ? (
+            <Button aria-label={t('app.navigation.back')} className="app-header-back-button" onClick={onBack}>
+              ←
+            </Button>
+          ) : null}
+          <Typography.Heading level={headerVariant === 'compact' ? 2 : 1}>{headerTitle}</Typography.Heading>
+        </div>
+
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
