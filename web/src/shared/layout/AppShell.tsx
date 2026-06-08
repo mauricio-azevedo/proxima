@@ -43,6 +43,7 @@ export function AppShell({
   const pickupGamesHome = usePickupGamesHome();
   const activePickupGame = pickupGamesHome.data?.activePickupGame ?? null;
   const headerTitle = title ?? getTabTitle(activeTab, t);
+  const showCreateAction = activeTab === 'home' && !children && onCreatePickupGameRequested;
 
   return (
     <main className="app-frame">
@@ -50,13 +51,18 @@ export function AppShell({
         <div className="app-header-title-group">
           {onBack ? (
             <Button aria-label={t('app.navigation.back')} className="app-header-back-button" onClick={onBack}>
-              ←
+              {'<'}
             </Button>
           ) : null}
           <Typography.Heading level={headerVariant === 'compact' ? 2 : 1}>{headerTitle}</Typography.Heading>
         </div>
 
         <div className="app-header-actions">
+          {showCreateAction ? (
+            <Button aria-label={t('pickupGames.action.create')} className="app-header-create-button" onClick={onCreatePickupGameRequested}>
+              +
+            </Button>
+          ) : null}
           <LanguageMenuButton />
           <ThemeToggleButton />
           <Separator orientation="vertical" className="h-6 self-center" />
