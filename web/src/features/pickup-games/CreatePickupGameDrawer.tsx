@@ -1,5 +1,5 @@
 import type * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Button, Drawer, Form, InputGroup, Label, TextField, Typography } from '@heroui/react';
 
@@ -9,6 +9,7 @@ import type { CreatePickupGameRequest } from './types/create-pickup-game-request
 import type { PickupGameVisibility, Weekday } from './types/pickup-game-home';
 
 const CREATE_PICKUP_GAME_FORM_ID = 'create-pickup-game-form';
+const DRAWER_CLOSE_NAVIGATION_DELAY_MS = 260;
 const MIN_PICKUP_GAME_NAME_LENGTH = 2;
 const MIN_TEAM_SIZE = 2;
 const MAX_TEAM_SIZE = 11;
@@ -31,6 +32,7 @@ interface CreatePickupGameDrawerProps {
 
 export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePickupGameDrawerProps) {
   const { t } = useLocale();
+  const [isDrawerOpen, setIsDrawerOpen] = useState(isOpen);
   const [name, setName] = useState('');
   const [locationName, setLocationName] = useState('');
   const [weekday, setWeekday] = useState<Weekday | null>(null);
@@ -39,13 +41,43 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
   const [visibility, setVisibility] = useState<PickupGameVisibility>('PRIVATE');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const closeNavigationTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isClosingRef = useRef(false);
 
   const validationMessage = getValidationMessage({ name, weekday, startTime, defaultTeamSize }, t);
   const isSubmitDisabled = isSubmitting || validationMessage !== null;
 
+  useEffect(() => {
+    if (isOpen) {
+      isClosingRef.current = false;
+      setIsDrawerOpen(true);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (closeNavigationTimeoutRef.current) {
+        clearTimeout(closeNavigationTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  function requestClose(afterClose: () => void = onClose) {
+    if (isSubmitting || isClosingRef.current) {
+      return;
+    }
+
+    isClosingRef.current = true;
+    setIsDrawerOpen(false);
+
+    closeNavigationTimeoutRef.current = setTimeout(() => {
+      afterClose();
+    }, DRAWER_CLOSE_NAVIGATION_DELAY_MS);
+  }
+
   function handleOpenChange(nextIsOpen: boolean) {
-    if (!nextIsOpen && !isSubmitting) {
-      onClose();
+    if (!nextIsOpen) {
+      requestClose();
     }
   }
 
@@ -80,31 +112,33 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
 
     try {
       await createPickupGame(payload);
-      onCreated();
+      setIsSubmitting(false);
+      requestClose(onCreated);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : t('pickupGames.create.errorFallback'));
-    } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
     <Drawer>
-      <Drawer.Backdrop isOpen={isOpen} onOpenChange={handleOpenChange}>
+      <Drawer.Backdrop isOpen={isDrawerOpen} onOpenChange={handleOpenChange}>
         <Drawer.Content placement="bottom">
           <Drawer.Dialog aria-label={t('pickupGames.create.title')} className="create-pickup-game-drawer-dialog">
             <Drawer.Handle />
             <Drawer.CloseTrigger />
 
             <Drawer.Header>
-              <div className="grid gap-1">
-                <Drawer.Heading>{t('pickupGames.create.title')}</Drawer.Heading>
-                <Typography.Paragraph color="muted">{t('pickupGames.create.description')}</Typography.Paragraph>
-              </div>
+              <Drawer.Heading>{t('pickupGames.create.title')}</Drawer.Heading>
             </Drawer.Header>
 
             <Drawer.Body>
-              <Form id={CREATE_PICKUP_GAME_FORM_ID} aria-label={t('pickupGames.create.title')} className="create-pickup-game-form" onSubmit={submit}>
+              <Form
+                id={CREATE_PICKUP_GAME_FORM_ID}
+                aria-label={t('pickupGames.create.title')}
+                className="create-pickup-game-form create-pickup-game-drawer-form"
+                onSubmit={submit}
+              >
                 <CreatePickupGameTextField
                   isRequired
                   label={t('pickupGames.create.name')}
@@ -142,10 +176,15 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
                   </InputGroup>
                 </TextField>
 
-                <ChoiceGroup label={t('pickupGames.create.weekday')} isRequired>
+                <ChoiceGroup label={t('pickupGames.create.weekday')} isRequired className="create-pickup-game-weekday-list">
                   {WEEKDAYS.map((option) => (
-                    <ChoiceButton key={option} isSelected={weekday === option} onPress={() => setWeekday(option)}>
-                      {t(getWeekdayMessageId(option))}
+                    <ChoiceButton
+                      key={option}
+                      ariaLabel={t(getWeekdayMessageId(option))}
+                      isSelected={weekday === option}
+                      onPress={() => setWeekday(option)}
+                    >
+                      {getWeekdayInitial(option)}
                     </ChoiceButton>
                   ))}
                 </ChoiceGroup>
@@ -168,7 +207,7 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
             </Drawer.Body>
 
             <Drawer.Footer>
-              <Button type="button" isDisabled={isSubmitting} onClick={onClose}>
+              <Button type="button" isDisabled={isSubmitting} onClick={() => requestClose()}>
                 {t('pickupGames.create.cancel')}
               </Button>
               <Button type="submit" form={CREATE_PICKUP_GAME_FORM_ID} variant="primary" isDisabled={isSubmitDisabled}>
@@ -207,23 +246,44 @@ function CreatePickupGameTextField({
   );
 }
 
-function ChoiceGroup({ children, label, isRequired }: { children: React.ReactNode; label: string; isRequired?: boolean }) {
+function ChoiceGroup({
+  children,
+  label,
+  isRequired,
+  className,
+}: {
+  children: React.ReactNode;
+  label: string;
+  isRequired?: boolean;
+  className?: string;
+}) {
   return (
     <div className="create-pickup-game-choice-group">
       <Label>
         {label}
         {isRequired ? ' *' : ''}
       </Label>
-      <div className="create-pickup-game-choice-list" role="group" aria-label={label}>
+      <div className={className ? `create-pickup-game-choice-list ${className}` : 'create-pickup-game-choice-list'} role="group" aria-label={label}>
         {children}
       </div>
     </div>
   );
 }
 
-function ChoiceButton({ children, isSelected, onPress }: { children: React.ReactNode; isSelected: boolean; onPress: () => void }) {
+function ChoiceButton({
+  children,
+  ariaLabel,
+  isSelected,
+  onPress,
+}: {
+  children: React.ReactNode;
+  ariaLabel?: string;
+  isSelected: boolean;
+  onPress: () => void;
+}) {
   return (
     <Button
+      aria-label={ariaLabel}
       aria-pressed={isSelected}
       type="button"
       variant={isSelected ? 'primary' : undefined}
@@ -262,4 +322,14 @@ function getValidationMessage(
 
 function getWeekdayMessageId(weekday: Weekday) {
   return `weekday.${weekday}` as const;
+}
+
+function getWeekdayInitial(weekday: Weekday) {
+  if (weekday === 'MONDAY') return 'M';
+  if (weekday === 'TUESDAY') return 'T';
+  if (weekday === 'WEDNESDAY') return 'W';
+  if (weekday === 'THURSDAY') return 'T';
+  if (weekday === 'FRIDAY') return 'F';
+  if (weekday === 'SATURDAY') return 'S';
+  return 'S';
 }
