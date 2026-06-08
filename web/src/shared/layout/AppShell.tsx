@@ -1,8 +1,11 @@
 import { ArrowRightFromSquare, Gear, Person } from '@gravity-ui/icons';
-import { Avatar, Dropdown, Label, Separator, Tabs } from '@heroui/react';
+import { Avatar, Card, Dropdown, Label, Separator, Tabs, Typography } from '@heroui/react';
 
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
+import { LivePickupGameBar } from '../../features/pickup-games/components/LivePickupGameBar';
+import { usePickupGamesHome } from '../../features/pickup-games/hooks/use-pickup-games-home';
+import { PickupGamesHomePage } from '../../features/pickup-games/PickupGamesHomePage';
 import { LanguageMenuButton } from '../i18n/components/LanguageMenuButton';
 import { useLocale } from '../i18n/hooks/use-locale';
 import { ThemeToggleButton } from '../theme/components/ThemeToggleButton';
@@ -16,11 +19,13 @@ interface AppShellProps {
 
 export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellProps) {
   const { t } = useLocale();
+  const pickupGamesHome = usePickupGamesHome();
+  const activePickupGame = pickupGamesHome.data?.activePickupGame ?? null;
 
   return (
     <main className="app-frame">
       <header className="app-header">
-        <h1>{getTabTitle(activeTab, t)}</h1>
+        <Typography.Heading level={1}>{getTabTitle(activeTab, t)}</Typography.Heading>
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
@@ -29,7 +34,13 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
         </div>
       </header>
 
-      <section className="app-content" />
+      <section className="app-content">{renderActiveTab(activeTab, pickupGamesHome)}</section>
+
+      {activePickupGame ? (
+        <div className="app-live-bar">
+          <LivePickupGameBar pickupGame={activePickupGame} />
+        </div>
+      ) : null}
 
       <nav className="app-dock" aria-label={t('app.navigation.main')}>
         <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
@@ -54,6 +65,34 @@ export function AppShell({ activeTab, user, onTabChange, onLogout }: AppShellPro
         </Tabs>
       </nav>
     </main>
+  );
+}
+
+function renderActiveTab(activeTab: AppTab, pickupGamesHome: ReturnType<typeof usePickupGamesHome>) {
+  if (activeTab === 'home') {
+    return (
+      <PickupGamesHomePage
+        data={pickupGamesHome.data}
+        errorMessage={pickupGamesHome.errorMessage}
+        status={pickupGamesHome.status}
+      />
+    );
+  }
+
+  return <PlaceholderTab />;
+}
+
+function PlaceholderTab() {
+  const { t } = useLocale();
+
+  return (
+    <div className="app-content-state">
+      <Card className="w-full">
+        <Card.Content>
+          <Typography.Paragraph color="muted">{t('app.placeholder')}</Typography.Paragraph>
+        </Card.Content>
+      </Card>
+    </div>
   );
 }
 
@@ -106,12 +145,7 @@ function UserMenu({ user, onLogout }: { user: UserSession; onLogout: () => void 
         <Separator />
 
         <Dropdown.Menu className="w-full min-w-0">
-          <Dropdown.Item
-            id="logout"
-            textValue={t('menu.signOut')}
-            variant="danger"
-            onClick={onLogout}
-          >
+          <Dropdown.Item id="logout" textValue={t('menu.signOut')} variant="danger" onClick={onLogout}>
             <div className="flex w-full min-w-0 items-center justify-between gap-2">
               <Label>{t('menu.signOut')}</Label>
               <ArrowRightFromSquare className="size-3.5 shrink-0 text-danger" />
