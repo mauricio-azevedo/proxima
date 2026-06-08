@@ -135,6 +135,12 @@
   margin: 0 auto;
 }
 
+.create-pickup-game-drawer-dialog {
+  height: 100svh;
+  max-height: 100svh;
+  border-radius: 1.5rem 1.5rem 0 0;
+}
+
 .pickup-games-home {
   display: grid;
   gap: 1.5rem;
