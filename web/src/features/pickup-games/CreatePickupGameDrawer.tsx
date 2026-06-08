@@ -184,7 +184,7 @@ export function CreatePickupGameDrawer({ isOpen, onClose, onCreated }: CreatePic
                       isSelected={weekday === option}
                       onPress={() => setWeekday(option)}
                     >
-                      {getWeekdayInitial(option)}
+                      {t(getWeekdayCompactMessageId(option))}
                     </ChoiceButton>
                   ))}
                 </ChoiceGroup>
@@ -324,12 +324,6 @@ function getWeekdayMessageId(weekday: Weekday) {
   return `weekday.${weekday}` as const;
 }
 
-function getWeekdayInitial(weekday: Weekday) {
-  if (weekday === 'MONDAY') return 'M';
-  if (weekday === 'TUESDAY') return 'T';
-  if (weekday === 'WEDNESDAY') return 'W';
-  if (weekday === 'THURSDAY') return 'T';
-  if (weekday === 'FRIDAY') return 'F';
-  if (weekday === 'SATURDAY') return 'S';
-  return 'S';
+function getWeekdayCompactMessageId(weekday: Weekday) {
+  return `weekday.compact.${weekday}` as const;
 }
