@@ -9,7 +9,7 @@ import { AuthSessionLoadingPage } from '../features/auth/session/AuthSessionLoad
 import type { AuthOperation } from '../features/auth/types/auth-operation';
 import type { LoginRequest } from '../features/auth/types/login-request';
 import type { RegisterRequest } from '../features/auth/types/register-request';
-import { CreatePickupGameOverlay } from '../features/pickup-games/CreatePickupGameOverlay';
+import { CreatePickupGamePage } from '../features/pickup-games/CreatePickupGamePage';
 import { useLocale } from '../shared/i18n/hooks/use-locale';
 import { AppShell } from '../shared/layout/AppShell';
 import { PageFade } from '../shared/ui/PageFade';
@@ -80,6 +80,11 @@ export function App() {
   function navigateToCreatePickupGame() {
     setActiveTab('home');
     navigate('/app/pickup-games/new');
+  }
+
+  function navigateToHome() {
+    setActiveTab('home');
+    navigate('/app');
   }
 
   function changeTab(tab: AppTab) {
@@ -157,16 +162,20 @@ export function App() {
                   isAuthenticated={authenticated}
                   element={
                     authSession.user ? (
-                      <>
-                        <AppShell
-                          activeTab="home"
-                          user={authSession.user}
-                          onCreatePickupGameRequested={navigateToCreatePickupGame}
-                          onTabChange={changeTab}
-                          onLogout={logout}
-                        />
-                        <CreatePickupGameOverlay />
-                      </>
+                      <AppShell
+                        activeTab="home"
+                        headerVariant="compact"
+                        showDock={false}
+                        showLiveBar={false}
+                        title={t('pickupGames.create.shellTitle')}
+                        user={authSession.user}
+                        onBack={navigateToHome}
+                        onCreatePickupGameRequested={navigateToCreatePickupGame}
+                        onTabChange={changeTab}
+                        onLogout={logout}
+                      >
+                        <CreatePickupGamePage onCreated={navigateToHome} />
+                      </AppShell>
                     ) : null
                   }
                 />
