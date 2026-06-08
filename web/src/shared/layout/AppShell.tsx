@@ -16,6 +16,9 @@ interface AppShellProps {
   activeTab: AppTab;
   user: UserSession;
   children?: ReactNode;
+  headerVariant?: 'default' | 'compact';
+  showDock?: boolean;
+  showLiveBar?: boolean;
   title?: string;
   onCreatePickupGameRequested?: () => void;
   onTabChange: (tab: AppTab) => void;
@@ -26,6 +29,9 @@ export function AppShell({
   activeTab,
   user,
   children,
+  headerVariant = 'default',
+  showDock = true,
+  showLiveBar = true,
   title,
   onCreatePickupGameRequested,
   onTabChange,
@@ -34,11 +40,12 @@ export function AppShell({
   const { t } = useLocale();
   const pickupGamesHome = usePickupGamesHome();
   const activePickupGame = pickupGamesHome.data?.activePickupGame ?? null;
+  const headerTitle = title ?? getTabTitle(activeTab, t);
 
   return (
     <main className="app-frame">
-      <header className="app-header">
-        <Typography.Heading level={1}>{title ?? getTabTitle(activeTab, t)}</Typography.Heading>
+      <header className={`app-header app-header--${headerVariant}`}>
+        <Typography.Heading level={headerVariant === 'compact' ? 2 : 1}>{headerTitle}</Typography.Heading>
         <div className="app-header-actions">
           <LanguageMenuButton />
           <ThemeToggleButton />
@@ -47,38 +54,40 @@ export function AppShell({
         </div>
       </header>
 
-      <section className="app-content">
+      <section className={showDock ? 'app-content' : 'app-content app-content--focused'}>
         {children ?? renderActiveTab(activeTab, pickupGamesHome, onCreatePickupGameRequested)}
       </section>
 
-      {activePickupGame ? (
+      {showLiveBar && activePickupGame ? (
         <div className="app-live-bar">
           <LivePickupGameBar pickupGame={activePickupGame} />
         </div>
       ) : null}
 
-      <nav className="app-dock" aria-label={t('app.navigation.main')}>
-        <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
-          <Tabs.ListContainer>
-            <Tabs.List aria-label={t('app.navigation.main')}>
-              <Tabs.Tab id="home">
-                {t('app.tabs.home')}
-                <Tabs.Indicator />
-              </Tabs.Tab>
+      {showDock ? (
+        <nav className="app-dock" aria-label={t('app.navigation.main')}>
+          <Tabs selectedKey={activeTab} onSelectionChange={(key) => onTabChange(key as AppTab)}>
+            <Tabs.ListContainer>
+              <Tabs.List aria-label={t('app.navigation.main')}>
+                <Tabs.Tab id="home">
+                  {t('app.tabs.home')}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
 
-              <Tabs.Tab id="search">
-                {t('app.tabs.search')}
-                <Tabs.Indicator />
-              </Tabs.Tab>
+                <Tabs.Tab id="search">
+                  {t('app.tabs.search')}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
 
-              <Tabs.Tab id="profile">
-                {t('app.tabs.profile')}
-                <Tabs.Indicator />
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs.ListContainer>
-        </Tabs>
-      </nav>
+                <Tabs.Tab id="profile">
+                  {t('app.tabs.profile')}
+                  <Tabs.Indicator />
+                </Tabs.Tab>
+              </Tabs.List>
+            </Tabs.ListContainer>
+          </Tabs>
+        </nav>
+      ) : null}
     </main>
   );
 }
