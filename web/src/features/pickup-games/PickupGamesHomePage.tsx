@@ -8,9 +8,15 @@ interface PickupGamesHomePageProps {
   data: PickupGamesHomeResponse | null;
   errorMessage: string | null;
   status: 'loading' | 'success' | 'error';
+  onCreatePickupGameRequested?: () => void;
 }
 
-export function PickupGamesHomePage({ data, errorMessage, status }: PickupGamesHomePageProps) {
+export function PickupGamesHomePage({
+  data,
+  errorMessage,
+  status,
+  onCreatePickupGameRequested,
+}: PickupGamesHomePageProps) {
   const { t } = useLocale();
 
   if (status === 'loading') {
@@ -41,13 +47,19 @@ export function PickupGamesHomePage({ data, errorMessage, status }: PickupGamesH
   if (empty) {
     return (
       <div className="pickup-games-home">
-        <EmptyPickupGamesState />
+        <EmptyPickupGamesState onCreatePickupGameRequested={onCreatePickupGameRequested} />
       </div>
     );
   }
 
   return (
     <div className="pickup-games-home">
+      <div className="pickup-games-primary-action">
+        <Button variant="primary" onClick={onCreatePickupGameRequested}>
+          {t('pickupGames.action.create')}
+        </Button>
+      </div>
+
       <section className="pickup-games-section" aria-labelledby="my-pickup-games-title">
         <div className="pickup-games-section-header">
           <Typography.Heading id="my-pickup-games-title" level={2}>
@@ -93,7 +105,7 @@ export function PickupGamesHomePage({ data, errorMessage, status }: PickupGamesH
   );
 }
 
-function EmptyPickupGamesState() {
+function EmptyPickupGamesState({ onCreatePickupGameRequested }: { onCreatePickupGameRequested?: () => void }) {
   const { t } = useLocale();
 
   return (
@@ -104,7 +116,9 @@ function EmptyPickupGamesState() {
           <Typography.Paragraph color="muted">{t('pickupGames.empty.description')}</Typography.Paragraph>
         </div>
 
-        <Button variant="primary">{t('pickupGames.action.create')}</Button>
+        <Button variant="primary" onClick={onCreatePickupGameRequested}>
+          {t('pickupGames.action.create')}
+        </Button>
       </Card.Content>
     </Card>
   );
