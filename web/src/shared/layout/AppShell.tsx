@@ -50,7 +50,7 @@ export function AppShell({
       <header className={`app-header app-header--${headerVariant}`}>
         <div className="app-header-title-group">
           {onBack ? (
-            <Button aria-label={t('app.navigation.back')} className="app-header-back-button" onClick={onBack}>
+            <Button aria-label={t('app.navigation.back')} className="app-header-back-button create-pickup-game-choice-button" onClick={onBack}>
               {'<'}
             </Button>
           ) : null}
