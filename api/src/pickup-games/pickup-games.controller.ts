@@ -13,12 +13,13 @@ import {
 import { AuthGuard } from '../auth/auth.guard';
 import type { AuthenticatedRequest } from '../auth/authenticated-request';
 import type { CreateMatchGoalDto } from './dto/create-match-goal.dto';
-import type { CreatePickupGameDto } from './dto/create-pickup-game.dto';
 import type { FinishMatchDto } from './dto/finish-match.dto';
+import type { CreatePickupGameDto } from './dto/create-pickup-game.dto';
 import type { UpdateGameDayTeamSizeDto } from './dto/update-game-day-team-size.dto';
 import type { UpdateMatchGoalDto } from './dto/update-match-goal.dto';
 import { GameDaysService } from './game-days.service';
 import { PickupGamesHomeService } from './pickup-games-home.service';
+import type { PickupGamesHomeResponse } from './pickup-games-home.service';
 import { PickupGamesService } from './pickup-games.service';
 
 @Controller('pickup-games')
@@ -36,7 +37,7 @@ export class PickupGamesController {
   }
 
   @Get('home')
-  getHome(@Req() request: AuthenticatedRequest) {
+  getHome(@Req() request: AuthenticatedRequest): Promise<PickupGamesHomeResponse> {
     return this.pickupGamesHomeService.getHome(request.user.id);
   }
 
