@@ -23,11 +23,10 @@ const WEEKDAYS: Weekday[] = [
 ];
 
 interface CreatePickupGamePageProps {
-  onCancel: () => void;
   onCreated: () => void;
 }
 
-export function CreatePickupGamePage({ onCancel, onCreated }: CreatePickupGamePageProps) {
+export function CreatePickupGamePage({ onCreated }: CreatePickupGamePageProps) {
   const { t } = useLocale();
   const [name, setName] = useState('');
   const [locationName, setLocationName] = useState('');
@@ -154,9 +153,6 @@ export function CreatePickupGamePage({ onCancel, onCreated }: CreatePickupGamePa
           </Card.Content>
 
           <Card.Footer className="create-pickup-game-actions">
-            <Button type="button" onClick={onCancel}>
-              {t('pickupGames.create.cancel')}
-            </Button>
             <Button type="submit" variant="primary" isDisabled={isSubmitDisabled}>
               {isSubmitting ? t('pickupGames.create.submitting') : t('pickupGames.create.submit')}
             </Button>
