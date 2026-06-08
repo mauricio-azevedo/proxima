@@ -1,3 +1,5 @@
+import { CreatePickupGamePage } from './CreatePickupGamePage';
+
 export function CreatePickupGameOverlay() {
-  return null;
+  return <CreatePickupGamePage onCreated={() => undefined} />;
 }
