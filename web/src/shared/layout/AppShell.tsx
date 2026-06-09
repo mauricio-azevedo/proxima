@@ -6,7 +6,7 @@ import { Avatar, Button, Card, Dropdown, Label, Separator, Tabs, Typography } fr
 import type { AppTab } from '../../app/types/app-tab';
 import type { UserSession } from '../../app/types/user-session';
 import { LivePickupGameBar } from '../../features/pickup-games/components/LivePickupGameBar';
-import { usePickupGamesHome } from '../../features/pickup-games/hooks/use-pickup-games-home';
+import type { PickupGamesHomeController } from '../../features/pickup-games/hooks/use-pickup-games-home';
 import { PickupGamesHomePage } from '../../features/pickup-games/PickupGamesHomePage';
 import { LanguageMenuButton } from '../i18n/components/LanguageMenuButton';
 import { useLocale } from '../i18n/hooks/use-locale';
@@ -14,6 +14,7 @@ import { ThemeToggleButton } from '../theme/components/ThemeToggleButton';
 
 interface AppShellProps {
   activeTab: AppTab;
+  pickupGamesHome: PickupGamesHomeController;
   user: UserSession;
   children?: ReactNode;
   headerVariant?: 'default' | 'compact';
@@ -28,6 +29,7 @@ interface AppShellProps {
 
 export function AppShell({
   activeTab,
+  pickupGamesHome,
   user,
   children,
   headerVariant = 'default',
@@ -40,7 +42,6 @@ export function AppShell({
   onLogout,
 }: AppShellProps) {
   const { t } = useLocale();
-  const pickupGamesHome = usePickupGamesHome();
   const activePickupGame = pickupGamesHome.data?.activePickupGame ?? null;
   const headerTitle = title ?? getTabTitle(activeTab, t);
   const showCreateAction = activeTab === 'home' && !children && onCreatePickupGameRequested;
@@ -110,7 +111,7 @@ export function AppShell({
 
 function renderActiveTab(
   activeTab: AppTab,
-  pickupGamesHome: ReturnType<typeof usePickupGamesHome>,
+  pickupGamesHome: PickupGamesHomeController,
   onCreatePickupGameRequested: (() => void) | undefined,
 ) {
   if (activeTab === 'home') {
