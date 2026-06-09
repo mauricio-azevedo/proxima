@@ -9,13 +9,11 @@ import { AuthSessionLoadingPage } from '../features/auth/session/AuthSessionLoad
 import type { AuthOperation } from '../features/auth/types/auth-operation';
 import type { LoginRequest } from '../features/auth/types/login-request';
 import type { RegisterRequest } from '../features/auth/types/register-request';
-import { CreatePickupGameDrawer } from '../features/pickup-games/CreatePickupGameDrawer';
 import { useLocale } from '../shared/i18n/hooks/use-locale';
-import { AppShell } from '../shared/layout/AppShell';
 import { PageFade } from '../shared/ui/PageFade';
 import '../App.css';
+import { AuthenticatedAppRoute } from './AuthenticatedAppRoute';
 import type { AppTab } from './types/app-tab';
-import type { UserSession } from './types/user-session';
 
 interface RouteState {
   from?: string;
@@ -144,14 +142,13 @@ export function App() {
                   isAuthenticated={authenticated}
                   element={
                     authSession.user ? (
-                      <AuthenticatedApp
+                      <AuthenticatedAppRoute
                         activeTab={activeTab}
                         user={authSession.user}
                         onCreatePickupGameRequested={navigateToCreatePickupGame}
                         onTabChange={changeTab}
                         onLogout={logout}
                         onCreateDrawerClosed={navigateToHome}
-                        onPickupGameCreated={navigateToHome}
                       />
                     ) : null
                   }
@@ -163,44 +160,6 @@ export function App() {
         </PageFade>
       )}
     </AnimatePresence>
-  );
-}
-
-function AuthenticatedApp({
-  activeTab,
-  user,
-  onCreatePickupGameRequested,
-  onTabChange,
-  onLogout,
-  onCreateDrawerClosed,
-  onPickupGameCreated,
-}: {
-  activeTab: AppTab;
-  user: UserSession;
-  onCreatePickupGameRequested: () => void;
-  onTabChange: (tab: AppTab) => void;
-  onLogout: () => void;
-  onCreateDrawerClosed: () => void;
-  onPickupGameCreated: () => void;
-}) {
-  const location = useLocation();
-  const isCreatePickupGameRoute = location.pathname === '/app/pickup-games/new';
-
-  if (location.pathname !== '/app' && !isCreatePickupGameRoute) {
-    return <Navigate to="/app" replace />;
-  }
-
-  return (
-    <>
-      <AppShell
-        activeTab={activeTab}
-        user={user}
-        onCreatePickupGameRequested={onCreatePickupGameRequested}
-        onTabChange={onTabChange}
-        onLogout={onLogout}
-      />
-      <CreatePickupGameDrawer isOpen={isCreatePickupGameRoute} onClose={onCreateDrawerClosed} onCreated={onPickupGameCreated} />
-    </>
   );
 }
 
