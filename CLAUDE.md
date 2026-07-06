@@ -19,6 +19,8 @@ consulte-o ao mexer em qualquer feature de domínio.
   valor.
 - **Na dúvida sobre uma regra de domínio, pergunte** ou consulte
   [docs/domain/pelada.md](docs/domain/pelada.md) — não invente a regra.
+- **Feature nova começa por um concept doc** ([template](docs/templates/concept.md)):
+  problema, appetite, casos & arestas — antes de codar.
 
 ## Regras de ouro
 
@@ -82,7 +84,9 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 
 ## Padrões (qualidade & arquitetura)
 
-**IMPORTANT: antes de escrever código, siga [docs/standards/engineering.md](docs/standards/engineering.md).**
+**IMPORTANT: antes de escrever código, siga [docs/standards/](docs/standards/)** —
+[engineering](docs/standards/engineering.md) (código & arquitetura),
+[code-review](docs/standards/code-review.md), [testing](docs/standards/testing.md).
 Parte é reforçada no lint/CI (complexidade cognitiva, aninhamento, params);
 o resto é cobrado no code review. Os princípios load-bearing:
 
@@ -109,6 +113,7 @@ o resto é cobrado no code review. Os princípios load-bearing:
   código, em `src/`. Prove lógica de domínio e componentes.
 - **E2E** (Playwright): em `e2e/`, fluxos de usuário de verdade.
 - Regra prática: toda regra de negócio de `docs/domain/pelada.md` merece teste.
+- Estratégia e classificação completas em [docs/standards/testing.md](docs/standards/testing.md).
 
 ## Armadilhas (gotchas)
 

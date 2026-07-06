@@ -9,7 +9,8 @@
 ## Checklist
 
 - [ ] `pnpm check` passa localmente (lint, typecheck, format, testes)
-- [ ] Comportamento novo tem teste (unit e/ou e2e)
+- [ ] Comportamento novo tem teste (unit e/ou e2e) — ver [testing](../docs/standards/testing.md)
+- [ ] Auto-revisado contra a [rubrica de code review](../docs/standards/code-review.md) (8 aspectos)
 - [ ] Regras de negócio afetadas atualizadas em `docs/domain/pelada.md`
 - [ ] Decisão arquitetural relevante virou ADR em `docs/adr/`
 - [ ] Sem segredos, logs de depuração ou código morto no diff
