@@ -8,6 +8,8 @@
   - [pelada.md](domain/pelada.md) — o domínio da pelada (fila, times, partida).
 - **[standards/](standards/)** — padrões **vinculantes** de qualidade.
   - [engineering.md](standards/engineering.md) — qualidade de código & arquitetura.
+  - [frontend.md](standards/frontend.md) — código React/Next (RSC, hooks, estado, perf).
+  - [ui-ux.md](standards/ui-ux.md) — design, UX e acessibilidade (WCAG 2.2 AA).
   - [code-review.md](standards/code-review.md) — rubrica de revisão (padrão Google).
   - [testing.md](standards/testing.md) — estratégia e classificação de testes.
 - **[adr/](adr/)** — decisões de arquitetura, imutáveis. Ver [ADR-0001](adr/0001-record-architecture-decisions.md).

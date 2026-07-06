@@ -79,6 +79,8 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 - **App Router**: componentes são **Server Components** por padrão; adicione
   `"use client"` só quando precisar de interatividade/estado no cliente.
 - **Estilo**: Tailwind; combine classes com `cn()` de `@/lib/utils`.
+- **UI**: alvo **WCAG 2.2 AA**; tokens semânticos, nunca valor cru; toda view de
+  dados cobre loading/empty/error. Detalhe em [ui-ux](docs/standards/ui-ux.md).
 - **TypeScript**: sem `any`. O `strict` está no máximo (inclui
   `noUncheckedIndexedAccess`); respeite a checagem em vez de silenciá-la.
 
@@ -86,6 +88,8 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 
 **IMPORTANT: antes de escrever código, siga [docs/standards/](docs/standards/)** —
 [engineering](docs/standards/engineering.md) (código & arquitetura),
+[frontend](docs/standards/frontend.md) (React/Next),
+[ui-ux](docs/standards/ui-ux.md) (design, UX, acessibilidade),
 [code-review](docs/standards/code-review.md), [testing](docs/standards/testing.md).
 Parte é reforçada no lint/CI (complexidade cognitiva, aninhamento, params);
 o resto é cobrado no code review. Os princípios load-bearing:
