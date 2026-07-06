@@ -1,0 +1,9 @@
+# pnpm blocks dependency lifecycle (install/build) scripts by default as a
+# supply-chain safeguard. This is the explicit allowlist of packages permitted
+# to run those scripts. Add an entry only after understanding why it builds.
+allowBuilds:
+  "@prisma/client": true # generates the typed query client
+  "@prisma/engines": true # downloads the Prisma query engine binary
+  prisma: true # Prisma CLI engine setup
+  sharp: true # Next.js image optimization (native bindings)
+  unrs-resolver: true # eslint-config-next module resolution (native bindings)
