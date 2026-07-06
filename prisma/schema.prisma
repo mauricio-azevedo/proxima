@@ -1,0 +1,26 @@
+// Prisma schema. Docs: https://pris.ly/d/prisma-schema
+// The generated client is written to src/generated/prisma (gitignored) by the
+// Prisma 7 `prisma-client` generator; run `pnpm db:generate` to (re)build it.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  // Prisma 7: the connection URL lives in prisma.config.ts (for the CLI/Migrate)
+  // and is passed to PrismaClient at runtime via a driver adapter (see
+  // src/lib/db.ts). It is deliberately NOT set here.
+  provider = "postgresql"
+}
+
+/// A person who shows up to play. This is the first real domain entity; the
+/// pelada / match / queue models are layered on top of it in Fase 6.
+model Player {
+  id        String   @id @default(cuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("players")
+}
