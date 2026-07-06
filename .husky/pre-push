@@ -1,0 +1,4 @@
+# Whole-project gate before code leaves the machine: types must check and unit
+# tests must pass. Mirrors (a subset of) what CI enforces, but faster feedback.
+pnpm typecheck
+pnpm test

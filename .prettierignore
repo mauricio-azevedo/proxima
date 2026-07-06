@@ -1,0 +1,14 @@
+# Generated / vendored — never format these.
+pnpm-lock.yaml
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+node_modules/
+next-env.d.ts
+
+# Prisma-generated client (regenerated from schema.prisma).
+src/generated/
+prisma/migrations/
