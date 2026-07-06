@@ -11,13 +11,22 @@ jogadores, formação de times, placar e rotação vencedor-fica). As regras de
 negócio e a linguagem ubíqua estão em **[docs/domain/pelada.md](docs/domain/pelada.md)** —
 consulte-o ao mexer em qualquer feature de domínio.
 
+## Como trabalhar
+
+- **Planeje antes de mudança grande**: proponha o plano e alinhe antes de
+  escrever muito código.
+- **Fatias verticais finas**: prefira a menor mudança ponta a ponta que entregue
+  valor.
+- **Na dúvida sobre uma regra de domínio, pergunte** ou consulte
+  [docs/domain/pelada.md](docs/domain/pelada.md) — não invente a regra.
+
 ## Regras de ouro
 
-1. **Os portões de qualidade não se contornam.** Todo trabalho precisa passar em
-   `pnpm check` (lint + typecheck + format + testes). Nunca use `--no-verify`.
+1. **IMPORTANT: os portões de qualidade não se contornam.** Todo trabalho precisa
+   passar em `pnpm check` (lint + typecheck + format + testes). Nunca use `--no-verify`.
 2. **Conventional Commits** obrigatórios (`feat:`, `fix:`, `chore:`, `docs:`,
    `refactor:`, `test:`, ...). O commit-msg hook rejeita o resto.
-3. **Nunca commite segredos.** Só `.env.example` é versionado; `.env` é ignorado.
+3. **IMPORTANT: nunca commite segredos.** Só `.env.example` é versionado; `.env` é ignorado.
 4. **Não edite código gerado** (`src/generated/**`) nem migrations já aplicadas.
 5. **Decisão arquitetural relevante → escreva um ADR** em `docs/adr/` (ver
    [ADR-0001](docs/adr/0001-record-architecture-decisions.md)).
@@ -86,8 +95,19 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 - **E2E** (Playwright): em `e2e/`, fluxos de usuário de verdade.
 - Regra prática: toda regra de negócio de `docs/domain/pelada.md` merece teste.
 
+## Armadilhas (gotchas)
+
+Coisas que já custaram tempo aqui — não repita:
+
+- **Portas locais**: app em **3100**, Postgres em **5434** (as padrão 3000/5433
+  são usadas por outros projetos nesta máquina).
+- **pnpm bloqueia build scripts** por segurança; libere só o necessário em
+  `pnpm-workspace.yaml` (`allowBuilds`).
+- **commitlint** limita cada linha do corpo do commit a **100 caracteres**.
+
 ## Git & PRs
 
 - Branch a partir de `main` (trunk-based); nada de commit direto na `main`.
-- Um PR por unidade de trabalho; CI verde é pré-requisito de merge.
-- Processo completo em [CONTRIBUTING.md](CONTRIBUTING.md).
+- A `main` tem **branch protection**: PR obrigatório e CI verde para mergear, sem
+  exceção (vale até para admins).
+- Um PR por unidade de trabalho. Processo completo em [CONTRIBUTING.md](CONTRIBUTING.md).
