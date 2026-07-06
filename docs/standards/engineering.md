@@ -7,6 +7,9 @@ princípio/fonte no PR** ("interface enxuta por deep module, cf. Ousterhout").
 Itens marcados com ⚙️ são **reforçados no lint/CI** — não são opinião, falham o
 build. O resto é seguido pelo agente e cobrado no code review.
 
+> Específico de frontend: [frontend.md](frontend.md) (React/Next) e
+> [ui-ux.md](ui-ux.md) (design/UX/acessibilidade).
+
 > A regra de ouro por trás de tudo: **reduzir complexidade**. Ousterhout define
 > complexidade como "qualquer coisa na estrutura do sistema que o torna difícil
 > de entender e modificar". Todo princípio abaixo serve a isso.
