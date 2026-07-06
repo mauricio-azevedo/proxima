@@ -80,6 +80,21 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 - **TypeScript**: sem `any`. O `strict` está no máximo (inclui
   `noUncheckedIndexedAccess`); respeite a checagem em vez de silenciá-la.
 
+## Padrões (qualidade & arquitetura)
+
+**IMPORTANT: antes de escrever código, siga [docs/standards/engineering.md](docs/standards/engineering.md).**
+Parte é reforçada no lint/CI (complexidade cognitiva, aninhamento, params);
+o resto é cobrado no code review. Os princípios load-bearing:
+
+- **Reduza complexidade**: módulos profundos (interface simples, implementação
+  encapsulada), não muitos módulos rasos (Ousterhout).
+- **DRY com juízo**: duplicação é mais barata que a abstração errada — abstraia
+  na 3ª repetição, não na 1ª (Metz).
+- **KISS/YAGNI**: a solução mais simples que resolve o caso real; nada de futuro
+  imaginado.
+- **Nomes revelam intenção**; comentários explicam o _porquê_, não o _o quê_.
+- Ao tomar uma decisão de design não óbvia, **cite o princípio/fonte no PR**.
+
 ## Banco de dados
 
 - Modelagem em `prisma/schema.prisma`. Após mudar: `pnpm db:migrate` (cria
