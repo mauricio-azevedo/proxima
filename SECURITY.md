@@ -20,6 +20,22 @@ Resposta esperada em poucos dias.
   versionado; `.env` é gitignored.
 - **Variáveis de ambiente são validadas** na inicialização (`src/env.ts`, via
   Zod) — a app não sobe com configuração inválida.
-- **Dependências**: o pnpm bloqueia scripts de build por padrão; only-built
-  dependencies são liberadas explicitamente e revisadas em `pnpm-workspace.yaml`.
+- **Dependências**: o pnpm bloqueia scripts de build por padrão (allowlist
+  revisada em `pnpm-workspace.yaml`); **Dependabot** abre PRs de update semanais e
+  **`pnpm audit` falha o CI** em vulnerabilidades high/critical.
 - **CI** roda em todo PR, mantendo a superfície de mudança sempre verificada.
+
+## Modelo de ameaça (OWASP Top 10:2025)
+
+Consciência de risco, não checklist de compliance:
+
+- **A01 — Broken Access Control** (nº 1 e o mais relevante aqui): quando o Próxima
+  tiver múltiplas peladas/usuários, o risco central é **acesso cruzado** — alguém
+  ver ou alterar a pelada de outro. Toda checagem de autorização deve ser
+  explícita e testada.
+- **A03 — Software Supply Chain**: mitigado por allowlist de build scripts,
+  Dependabot e o gate de `pnpm audit` no CI.
+- **Secret scanning** é automático (repositório público no GitHub).
+
+Advisory de audit sem correção disponível pode ser allowlistado em
+`package.json` (`pnpm.auditConfig.ignoreGhsas`), sempre com justificativa.
