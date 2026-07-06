@@ -36,6 +36,9 @@ jobs:
       # postinstall runs `prisma generate`, so the client exists for typecheck/build.
       - run: pnpm install --frozen-lockfile
 
+      # Supply-chain gate (OWASP A03): fail on high/critical advisories.
+      - run: pnpm audit --audit-level high
+
       - run: pnpm run lint
       - run: pnpm run typecheck
       - run: pnpm run format:check
