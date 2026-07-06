@@ -1,18 +1,14 @@
-node_modules
+# Generated / vendored — never format these.
+pnpm-lock.yaml
+.next/
+out/
+build/
+coverage/
+playwright-report/
+test-results/
+node_modules/
+next-env.d.ts
 
-# framework caches
-.angular
-web/.angular
-
-# build outputs
-dist
-api/dist
-web/dist
-
-# generated files
-api/generated
-api/src/generated
-coverage
-
-# package managers
-package-lock.json
+# Prisma-generated client (regenerated from schema.prisma).
+src/generated/
+prisma/migrations/

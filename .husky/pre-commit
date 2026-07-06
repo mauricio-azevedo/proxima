@@ -1,0 +1,3 @@
+# Fast, per-file gate: format + lint only the staged files.
+# Whole-project typecheck + tests run on pre-push and in CI.
+pnpm lint-staged
