@@ -1,0 +1,88 @@
+name: CI
+
+# Runs on every PR and on pushes to main. These checks are the gate: a red CI
+# blocks merge (once branch protection is enabled — see CONTRIBUTING.md).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Cancel superseded runs on the same ref to save CI minutes.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Format · Unit · Build
+    runs-on: ubuntu-latest
+    env:
+      # env.ts is validated at build time. This job doesn't touch a real DB, so
+      # a syntactically valid placeholder URL is enough to satisfy validation.
+      DATABASE_URL: postgresql://user:pass@localhost:5432/db?schema=public
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4 # version comes from package.json "packageManager"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      # postinstall runs `prisma generate`, so the client exists for typecheck/build.
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm run lint
+      - run: pnpm run typecheck
+      - run: pnpm run format:check
+      - run: pnpm run test
+      - run: pnpm run build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: proxima
+          POSTGRES_PASSWORD: proxima
+          POSTGRES_DB: proxima
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U proxima -d proxima"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://proxima:proxima@localhost:5432/proxima?schema=public
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Apply migrations to the throwaway CI database.
+      - run: pnpm exec prisma migrate deploy
+
+      - run: pnpm exec playwright install --with-deps chromium
+
+      - run: pnpm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
