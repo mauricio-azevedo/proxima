@@ -58,9 +58,10 @@ cabeça, extraia.
 
 ## Code review
 
-Adotamos o **padrão de code review do Google** como rubrica: o revisor aprova
-quando o CL melhora inequivocamente a saúde do código, mesmo que não perfeito. O
-autor mantém CLs pequenos e focados. Isso alimenta o `/code-review` e os PRs.
+A rubrica completa (8 aspectos + réguas de tamanho, padrão Google) está em
+**[code-review.md](code-review.md)**. Em uma linha: aprove o que **melhora
+inequivocamente a saúde do código**, mantenha PRs pequenos, e o agente se
+auto-revisa antes de marcar como pronto.
 
 ## Fontes
 

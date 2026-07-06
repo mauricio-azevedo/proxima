@@ -4,6 +4,10 @@
 
 Usamos **trunk-based development**: a `main` está sempre verde e deployável.
 
+> **Feature nova?** Comece por um concept doc curto
+> ([docs/templates/concept.md](docs/templates/concept.md)) — problema, appetite,
+> casos & arestas — antes de codar. Spec boa gera output bom.
+
 1. **Branch** a partir da `main`. Nome no formato `<tipo>/<descrição-curta>`,
    ex.: `feat/fila-de-jogadores`, `fix/empate-por-tempo`.
 2. **Commits** seguem [Conventional Commits](https://www.conventionalcommits.org):
