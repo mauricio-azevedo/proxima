@@ -4,6 +4,10 @@ import type { NextConfig } from "next";
 // error if anything required is missing or malformed.
 import "./src/env";
 
-const nextConfig: NextConfig = {/* config options here */};
+const nextConfig: NextConfig = {
+  // React Compiler (GA): auto-memoizes at build time, so we write plain code and
+  // do NOT hand-write useMemo/useCallback/memo for reference stability.
+  reactCompiler: true,
+};
 
 export default nextConfig;
