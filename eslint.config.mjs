@@ -24,6 +24,18 @@ const eslintConfig = defineConfig([
       "max-nested-callbacks": ["error", 3],
     },
   },
+  {
+    // Frontend correctness — extends eslint-config-next (which already enables
+    // react, react-hooks, jsx-a11y, @next/next). See docs/standards/frontend.md.
+    rules: {
+      "react/no-array-index-key": "error",
+      "react/no-unstable-nested-components": "error",
+      "react-hooks/exhaustive-deps": "error",
+      // React Compiler-era lints ("You Might Not Need an Effect"):
+      "react-hooks/no-deriving-state-in-effects": "error",
+      "react-hooks/set-state-in-effect": "error",
+    },
+  },
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([

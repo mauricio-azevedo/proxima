@@ -9,8 +9,12 @@ const config = {
   trailingComma: "all",
   printWidth: 100,
   tabWidth: 2,
-  // Sorts Tailwind utility classes into the canonical order.
+  // Sorts Tailwind utility classes into the canonical order. `tailwindFunctions`
+  // makes it also sort classes passed to cn(); `tailwindStylesheet` points it at
+  // the Tailwind v4 CSS entrypoint that defines the theme.
   plugins: ["prettier-plugin-tailwindcss"],
+  tailwindFunctions: ["cn"],
+  tailwindStylesheet: "./src/app/globals.css",
 };
 
 export default config;
