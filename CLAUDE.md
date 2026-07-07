@@ -64,6 +64,8 @@ e o _porquê_ em [ADR-0002](docs/adr/0002-architecture-and-tech-stack.md).
 src/
   app/         Rotas, layouts e páginas (App Router). Server Components por padrão.
   lib/         Utilitários compartilhados: db.ts (Prisma), utils.ts (cn).
+  components/  ui/ = primitivos shadcn/ui (VENDIDO do registro, isento do lint).
+  hooks/       Hooks do shadcn (vendido).
   generated/   Client Prisma — GERADO, gitignored, não editar.
   env.ts       Variáveis de ambiente validadas (Zod). Importe daqui, nunca process.env direto.
 e2e/           Testes Playwright.
@@ -81,6 +83,8 @@ docs/          adr/ (decisões) e domain/ (regras de negócio).
 - **Estilo**: Tailwind; combine classes com `cn()` de `@/lib/utils`.
 - **UI**: alvo **WCAG 2.2 AA**; tokens semânticos, nunca valor cru; toda view de
   dados cobre loading/empty/error. Detalhe em [ui-ux](docs/standards/ui-ux.md).
+- **Componentes**: use os primitivos de `@/components/ui` (shadcn/ui, [ADR-0003](docs/adr/0003-ui-library-shadcn.md));
+  adicione com `pnpm dlx shadcn@latest add <nome>`. Não edite-os à mão sem motivo.
 - **TypeScript**: sem `any`. O `strict` está no máximo (inclui
   `noUncheckedIndexedAccess`); respeite a checagem em vez de silenciá-la.
 

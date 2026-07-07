@@ -1,9 +1,9 @@
 # Padrões de UI/UX
 
-Padrões **vinculantes** de design visual, UX e acessibilidade. São **agnósticos de
-biblioteca** (a lib de UI será decidida num ADR na abertura da Fase 6 — recomendação:
-shadcn/ui, primitivos Radix acessíveis). Itens ⚙️ são reforçados no lint/CI; o resto
-é cobrado no review e no checklist por tela.
+Padrões **vinculantes** de design visual, UX e acessibilidade. A lib de UI é o
+**shadcn/ui** ([ADR-0003](../adr/0003-ui-library-shadcn.md), primitivos Base UI);
+estes princípios continuam valendo independente dela. Itens ⚙️ são reforçados no
+lint/CI; o resto é cobrado no review e no checklist por tela.
 
 > Regra por trás de tudo (Refactoring UI): **defina sistemas, limite escolhas.**
 > Espaçamento, tipografia e cor saem de escalas fixas — nunca de valores ad-hoc.
