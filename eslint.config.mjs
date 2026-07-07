@@ -50,6 +50,11 @@ const eslintConfig = defineConfig([
     "test-results/**",
     // Prisma-generated client.
     "src/generated/**",
+    // Vendored shadcn/ui registry code — Prettier-formatted and type-checked,
+    // but exempt from our opinionated lint (we don't hand-maintain it to our
+    // standards; a shadcn update would clobber edits).
+    "src/components/ui/**",
+    "src/hooks/**",
   ]),
 ]);
 
