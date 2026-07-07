@@ -1,0 +1,9 @@
+{
+  "projectId": "d2ddd51b-5628-43ad-9fe8-a42bd3043735",
+  "pkg": "proxima",
+  "globalName": "Proxima",
+  "shape": "package",
+  "srcDir": "src/components/ui",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": "compiled.css"
+}
