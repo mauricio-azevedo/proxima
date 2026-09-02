@@ -23,3 +23,8 @@ O que foi decidido, no presente e na voz ativa: "Vamos usar X".
 
 O que fica mais fácil e o que fica mais difícil como resultado. Inclua os pontos
 negativos honestamente — toda decisão tem trade-offs.
+
+## O que mudaria
+
+Em que condição esta decisão deve ser revista — o gatilho escrito para quem vier
+depois ("se X passar de Y", "quando Z existir"). Adiar sem gatilho é adiar para ninguém.

@@ -2,20 +2,11 @@
 
 ## Fluxo de trabalho
 
-Usamos **trunk-based development**: a `main` está sempre verde e deployável.
-
-> **Feature nova?** Comece por um concept doc curto
-> ([docs/templates/concept.md](docs/templates/concept.md)) — problema, appetite,
-> casos & arestas — antes de codar. Spec boa gera output bom.
-
-1. **Branch** a partir da `main`. Nome no formato `<tipo>/<descrição-curta>`,
-   ex.: `feat/fila-de-jogadores`, `fix/empate-por-tempo`.
-2. **Commits** seguem [Conventional Commits](https://www.conventionalcommits.org):
-   `feat:`, `fix:`, `chore:`, `docs:`, `refactor:`, `test:`, `perf:`, `ci:`.
-   O hook `commit-msg` rejeita mensagens fora do padrão.
-3. **Pull Request** para a `main`. O CI precisa estar verde para o merge.
-4. **Merge** com squash, mantendo um título em Conventional Commit (vira a linha
-   do histórico da `main` e alimenta changelogs futuros).
+O repositório segue o Relay, método de trabalho com agentes de código do autor (privado
+por ora): sessão sem estado, repositório com estado. Trabalho não trivial nasce de uma issue com plano carimbado
+(`/plano <n>`), é executado em raia própria (`/executa <n>`) e entra por PR com evidência
+real (output do gate, do e2e e do navegador). A `main` está sempre verde; merge com squash e
+título em Conventional Commit. Guia operacional completo em [`AGENTS.md`](AGENTS.md).
 
 ## Portões de qualidade
 
@@ -29,17 +20,22 @@ Rodam automaticamente — você não precisa lembrar, mas não os contorne
 | `git push`     | `typecheck` + testes unitários               | Husky `pre-push`   |
 | PR / push main | Lint, typecheck, format, unit, build, e2e    | GitHub Actions     |
 
-Para rodar o gate completo localmente a qualquer momento: `pnpm check`.
+Para rodar o gate completo localmente a qualquer momento: `pnpm check`. A proteção da
+`main` exige os dois jobs do CI e vale para administradores.
 
 ## Desenvolvimento local
 
 Ver o passo a passo de setup no [README](README.md#começando). Resumo do ciclo:
 
 ```bash
-docker compose up -d      # banco
-pnpm dev                  # app em http://localhost:3100
-pnpm test:watch           # testes em watch enquanto desenvolve
+source ~/.nvm/nvm.sh --no-use && nvm use   # node/pnpm do .nvmrc
+docker compose up -d                       # banco
+pnpm dev                                   # app em http://localhost:3100
+pnpm test:watch                            # testes em watch enquanto desenvolve
 ```
+
+Numa raia (worktree de uma issue), todo comando passa por `bin/raia <n> -- <comando>`, que
+sobe o banco, cria um database próprio e exporta `PORT` e `DATABASE_URL`.
 
 ## Banco de dados & migrations
 
@@ -52,27 +48,5 @@ pnpm test:watch           # testes em watch enquanto desenvolve
 
 Decisão significativa (cara de reverter, afeta a estrutura, ou geraria um "por
 que fizeram assim?") vira um ADR em `docs/adr/`, copiando `0000-template.md` e
-numerando na sequência. Ver [ADR-0001](docs/adr/0001-record-architecture-decisions.md).
-
-## Definition of Done
-
-Uma mudança está "pronta" quando:
-
-- [ ] `pnpm check` passa (lint, typecheck, format, testes).
-- [ ] Comportamento novo tem teste (unit e/ou e2e).
-- [ ] Regras de negócio afetadas estão refletidas em `docs/domain/pelada.md`.
-- [ ] Decisões relevantes viraram ADR.
-- [ ] Sem segredos, `console.log` de depuração ou código morto no diff.
-
-## Configurar branch protection (uma vez, no GitHub)
-
-Para que o CI vire um gate real de merge, ative em
-**Settings → Branches → Add rule** para a `main`:
-
-- ✅ Require a pull request before merging
-- ✅ Require status checks to pass before merging → selecione os checks
-  `quality` e `e2e` do workflow de CI
-- ✅ Require branches to be up to date before merging
-- ✅ Do not allow bypassing the above settings
-
-Isso impede push direto na `main` e merge com CI vermelho.
+numerando na sequência. A seção "O que mudaria" diz em que condição a decisão deve ser
+revista. Ver [ADR-0001](docs/adr/0001-record-architecture-decisions.md).
