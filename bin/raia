@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# bin/raia — isola o runtime de uma raia (worktree de uma issue): carrega o shell,
+# sobe o banco, cria o database da raia e roda o comando com PORT e DATABASE_URL
+# proprios. Sem isso, duas raias disputam a mesma porta e o mesmo banco.
+# Uso: bin/raia <n> -- <comando...>   |   bin/raia <n> --down
+#
+# Ajuste por projeto (os valores abaixo sao os da Proxima):
+project=proxima        # nome do projeto compose (docker compose -p); o servico do banco chama-se db
+container=proxima-db   # container do Postgres no docker-compose.yml
+pguser=proxima         # usuario e senha do Postgres; o database base tem o mesmo nome
+pgport=5434            # porta do Postgres no host
+base_port=3100         # porta do app fora de raia; a raia n usa base_port + n
+set -euo pipefail
+n="${1:?uso: bin/raia <n> -- <comando> | bin/raia <n> --down}"; shift
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+{ . "$NVM_DIR/nvm.sh" --no-use && nvm use; } >/dev/null 2>&1 \
+  || { echo "bin/raia: nvm use falhou (falta .nvmrc ou a versao nao esta instalada)" >&2; exit 1; }
+db="${project}_issue_${n}"
+root="$(git rev-parse --show-toplevel)"
+case "${1:-}" in
+  # --force: derruba conexoes abertas (next dev/start da raia) antes de apagar.
+  --down) docker exec "$container" dropdb -U "$pguser" --force --if-exists "$db"; exit 0 ;;
+  --) shift ;;
+  *) echo "uso: bin/raia <n> -- <comando> | bin/raia <n> --down" >&2; exit 2 ;;
+esac
+# -p: reusa o projeto compose do checkout principal; sem isso, um worktree criaria um
+# segundo projeto e disputaria a porta e o nome do container.
+docker compose -p "$project" -f "$root/docker-compose.yml" up -d db >/dev/null
+until docker exec "$container" pg_isready -U "$pguser" -d "$pguser" >/dev/null 2>&1; do sleep 1; done
+if ! docker exec "$container" psql -U "$pguser" -d "$pguser" -tAc \
+    "SELECT 1 FROM pg_database WHERE datname='${db}'" | grep -q 1; then
+  docker exec "$container" createdb -U "$pguser" "$db"
+fi
+export PORT="$((base_port + n))"
+export DATABASE_URL="postgresql://${pguser}:${pguser}@localhost:${pgport}/${db}?schema=public"
+exec "$@"
