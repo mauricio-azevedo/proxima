@@ -1,16 +1,18 @@
-## O que muda
+## O que muda e por quê
 
-<!-- Descreva o quê e, principalmente, o porquê. -->
+## Evidência
 
-## Como testar
+<!-- Cole o output real: gate, e2e, navegador. "Passou" não vale. -->
 
-<!-- Passos para o revisor verificar o comportamento. -->
+## Checklist honesto
 
-## Checklist
+- [ ] Cada critério de aceite do plano tem teste com o nome da frase
+- [ ] Trava do teste respeitada: nenhum commit altera teste e implementação juntos
+- [ ] `AGENTS.md` / ADR atualizados se houve armadilha ou decisão
+- [ ] Sem segredo, log de depuração ou código morto no diff
 
-- [ ] `pnpm check` passa localmente (lint, typecheck, format, testes)
-- [ ] Comportamento novo tem teste (unit e/ou e2e) — ver [testing](../docs/standards/testing.md)
-- [ ] Auto-revisado contra a [rubrica de code review](../docs/standards/code-review.md) (8 aspectos)
-- [ ] Regras de negócio afetadas atualizadas em `docs/domain/pelada.md`
-- [ ] Decisão arquitetural relevante virou ADR em `docs/adr/`
-- [ ] Sem segredos, logs de depuração ou código morto no diff
+## O que ficou de fora
+
+<!-- Com a consequência de cada corte. -->
+
+Refs #

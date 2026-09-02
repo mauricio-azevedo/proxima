@@ -1,8 +1,12 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Próxima runs on 3100 (see package.json dev/start) to avoid clashing with
-// other local dev servers on the default 3000.
-const PORT = 3100;
+// Uma raia (worktree de issue) sem PORT reusaria em silencio o servidor da main
+// em 3100 (reuseExistingServer). Fora de raia, 3100 continua o padrao.
+const inWorktree = process.cwd().includes("/.claude/worktrees/");
+if (inWorktree && !process.env["PORT"]) {
+  throw new Error("Raia sem PORT: rode via bin/raia <n> -- pnpm test:e2e");
+}
+const PORT = Number(process.env["PORT"] ?? 3100);
 const baseURL = `http://localhost:${PORT}`;
 
 /**

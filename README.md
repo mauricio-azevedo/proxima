@@ -74,6 +74,5 @@ docs/          Decisões (adr/) e regras de negócio (domain/)
 
 ## Contribuindo
 
-Fluxo de trabalho, padrões e Definition of Done em
-[CONTRIBUTING.md](CONTRIBUTING.md). Diretrizes para o agente de IA em
-[CLAUDE.md](CLAUDE.md).
+Fluxo de trabalho e portões de qualidade em [CONTRIBUTING.md](CONTRIBUTING.md).
+Diretrizes para o agente em [AGENTS.md](AGENTS.md) (o `CLAUDE.md` só o importa).

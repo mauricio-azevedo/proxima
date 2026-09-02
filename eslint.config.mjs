@@ -55,6 +55,13 @@ const eslintConfig = defineConfig([
     // standards; a shadcn update would clobber edits).
     "src/components/ui/**",
     "src/hooks/**",
+    // Raias do Relay (worktrees de issue) vivem dentro do checkout; sem isto o
+    // `pnpm check` da main varreria o codigo de outra raia.
+    ".claude/worktrees/**",
+    // Artefatos locais do design-sync (gitignored; o ESLint nao le o .gitignore).
+    ".ds-sync/**",
+    "ds-bundle/**",
+    ".design-sync/**",
   ]),
 ]);
 

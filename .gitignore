@@ -59,3 +59,6 @@ next-env.d.ts
 /.design-sync/.cache/
 /.design-sync/learnings/
 /.design-sync/node_modules
+
+# Raias do Relay (worktrees de issue) vivem dentro do checkout.
+/.claude/worktrees/
