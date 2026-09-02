@@ -52,3 +52,10 @@ yarn-error.log*
 next-env.d.ts
 
 /src/generated/prisma
+
+# design-sync (converter scripts, build output, cache — durable set under .design-sync/ IS committed)
+/.ds-sync/
+/ds-bundle/
+/.design-sync/.cache/
+/.design-sync/learnings/
+/.design-sync/node_modules
