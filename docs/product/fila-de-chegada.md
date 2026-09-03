@@ -22,7 +22,8 @@ fila de chegada, digital.
 
 ## Appetite
 
-Pequeno: uma fatia fina ponta a ponta (banco → server action → tela). ~Meia sessão.
+Pequeno: uma fatia fina ponta a ponta (banco → API → tela). ~Meia sessão, depois do
+andaime do [ADR-0004](../adr/0004-backend-separado-nestjs.md).
 Se estourar, corta escopo (ver Circuit breaker), não estica.
 
 ## Proposta
@@ -43,8 +44,8 @@ Tela única, mobile-first, usando os componentes acessíveis do `@/components/ui
 - **Estado vazio:** pelada sem jogadores → "Ninguém chegou ainda. Adicione o
   primeiro." (contrato de 4 estados, cf. [ui-ux.md](../standards/ui-ux.md)).
 - **Concorrência** (link compartilhado, duas pessoas adicionando junto): MVP
-  ordena por timestamp de criação; sem tempo real ainda (recarrega pra ver o
-  novo). Otimista no add local de quem digita.
+  ordena por posição de chegada (posição vs `createdAt`: ver "Impacto no domínio");
+  sem tempo real ainda (recarrega pra ver o novo). Otimista no add local de quem digita.
 
 ## FAQ de objeções
 
@@ -79,3 +80,16 @@ rótulo "1ª próxima".
 - Atualiza o [`pelada.md`](../domain/pelada.md): formaliza "Pelada" como entidade.
 - Decisões em aberto do domínio que esta fatia **adia** (não resolve): login,
   dono da pelada, histórico, desempate/regras de partida.
+- Depende do andaime do [ADR-0004](../adr/0004-backend-separado-nestjs.md) (API NestJS em
+  `apps/api`, Next só frontend): a fila é a primeira fatia a atravessar a costura
+  web → contrato → api → banco.
+- Recomendações levantadas na decisão do ADR-0004, para o plano confirmar ou refutar:
+  - **Participação ≠ identidade** — a entrada na fila é uma tabela própria (nome, posição,
+    `peladaId`); a conta de usuário, quando existir, vira FK opcional nela.
+  - **Posição explícita e só crescente por pelada**, em vez de ordenar por `createdAt` — a
+    regra 5 do domínio manda o perdedor para o fim da fila, e timestamp de criação não
+    expressa isso. Chegar e voltar do time perdedor são append; remover é delete; a
+    numeração de "próxima" é calculada na leitura.
+  - **Pelada como fronteira de transação** — toda mutação trava a linha da pelada
+    (`FOR UPDATE`) dentro da transação; dois organizadores tocando juntos serializam só
+    dentro daquela pelada, nunca entre peladas.
