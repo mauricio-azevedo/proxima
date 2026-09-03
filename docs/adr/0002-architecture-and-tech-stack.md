@@ -1,6 +1,7 @@
 # 0002. Arquitetura e stack de tecnologia
 
-- **Status**: Aceito
+- **Status**: Aceito; substituído parcialmente pelo
+  [ADR-0004](0004-backend-separado-nestjs.md) (framework de backend e "app único, não monorepo")
 - **Data**: 2026-07-06
 - **Decisores**: Maurício
 
