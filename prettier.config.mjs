@@ -14,7 +14,7 @@ const config = {
   // the Tailwind v4 CSS entrypoint that defines the theme.
   plugins: ["prettier-plugin-tailwindcss"],
   tailwindFunctions: ["cn"],
-  tailwindStylesheet: "./src/app/globals.css",
+  tailwindStylesheet: "./apps/web/src/app/globals.css",
 };
 
 export default config;
