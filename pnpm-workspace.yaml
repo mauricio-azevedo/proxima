@@ -1,3 +1,6 @@
+packages:
+  - "apps/*"
+
 # pnpm blocks dependency lifecycle (install/build) scripts by default as a
 # supply-chain safeguard. This is the explicit allowlist of packages permitted
 # to run those scripts. Add an entry only after understanding why it builds.

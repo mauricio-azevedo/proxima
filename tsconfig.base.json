@@ -1,0 +1,16 @@
+{
+  // Rigor de TypeScript compartilhado por todos os projetos do workspace. Só o que
+  // é política do repositório mora aqui; alvo, módulo e plugins são de cada app.
+  "compilerOptions": {
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noEmit": true
+  }
+}

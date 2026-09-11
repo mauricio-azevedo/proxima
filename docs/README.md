@@ -18,6 +18,9 @@
 
 ## Na raiz do repo
 
+A raiz é um workspace pnpm que só orquestra; o código de aplicação vive em `apps/` (hoje
+`apps/web`, o app Next). O porquê da separação está em [ADR-0004](adr/0004-backend-separado-nestjs.md).
+
 - [AGENTS.md](../AGENTS.md) — guia operacional do agente, sempre carregado (o `CLAUDE.md` só o importa).
 - [product/](product/) — conceito de cada feature, ex.: [fila-de-chegada.md](product/fila-de-chegada.md).
 - [CONTRIBUTING.md](../CONTRIBUTING.md) · [SECURITY.md](../SECURITY.md) · [README.md](../README.md)

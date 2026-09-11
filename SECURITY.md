@@ -18,8 +18,8 @@ Resposta esperada em poucos dias.
 
 - **Segredos nunca são commitados.** Apenas `.env.example` (sem valores reais) é
   versionado; `.env` é gitignored.
-- **Variáveis de ambiente são validadas** na inicialização (`src/env.ts`, via
-  Zod) — a app não sobe com configuração inválida.
+- **Variáveis de ambiente são validadas** na inicialização (`apps/web/src/env.ts`,
+  via Zod) — a app não sobe com configuração inválida.
 - **Dependências**: o pnpm bloqueia scripts de build por padrão (allowlist
   revisada em `pnpm-workspace.yaml`); **Dependabot** abre PRs de update semanais e
   **`pnpm audit` falha o CI** em vulnerabilidades high/critical.

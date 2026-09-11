@@ -27,8 +27,8 @@ O _porquê_ de cada escolha está em [docs/adr](docs/adr).
 # 1. Instalar dependências (gera o client do Prisma automaticamente)
 pnpm install
 
-# 2. Configurar o ambiente
-cp .env.example .env
+# 2. Configurar o ambiente (o .env é por app, não na raiz)
+cp apps/web/.env.example apps/web/.env
 
 # 3. Subir o banco (Postgres em container, porta 5434)
 docker compose up -d
@@ -59,17 +59,24 @@ pnpm check   # lint + typecheck + format + testes
 | `pnpm db:migrate` | Cria e aplica migration (dev)                     |
 | `pnpm db:studio`  | Abre o Prisma Studio                              |
 
-Lista completa em [`package.json`](package.json).
+Lista completa em [`package.json`](package.json) (raiz) e
+[`apps/web/package.json`](apps/web/package.json) (o app). Adicionar um primitivo shadcn/ui é
+a exceção que não roda da raiz: `cd apps/web && pnpm dlx shadcn@latest add <nome>`.
 
 ## Estrutura
 
+Monorepo pnpm: cada aplicação vive em `apps/` e a raiz só orquestra (todos os comandos
+acima rodam dela e delegam ao projeto dono).
+
 ```
-src/app/       Rotas, layouts e páginas (App Router)
-src/lib/       Utilitários compartilhados (db, cn)
-src/env.ts     Variáveis de ambiente validadas
-e2e/           Testes Playwright
-prisma/        Schema e migrations
-docs/          Decisões (adr/) e regras de negócio (domain/)
+apps/web/           O app Next (@proxima/web)
+  src/app/            Rotas, layouts e páginas (App Router)
+  src/lib/            Utilitários compartilhados (db, cn)
+  src/env.ts          Variáveis de ambiente validadas
+  prisma/             Schema e migrations
+  .env                Ambiente do app (template em .env.example)
+e2e/                Testes Playwright
+docs/               Decisões (adr/) e regras de negócio (domain/)
 ```
 
 ## Contribuindo

@@ -10,8 +10,8 @@ node_modules/
 next-env.d.ts
 
 # Prisma-generated client (regenerated from schema.prisma).
-src/generated/
-prisma/migrations/
+apps/*/src/generated/
+apps/*/prisma/migrations/
 
 # Raias do Relay (worktrees de issue) e artefatos locais do design-sync: nao formatar.
 .claude/worktrees/

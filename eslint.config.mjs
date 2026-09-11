@@ -9,8 +9,20 @@ import sonarjs from "eslint-plugin-sonarjs";
 // code quality.
 import prettier from "eslint-config-prettier";
 
+// O app Next vive em apps/web, entao as regras de Next/React valem so la.
+// `nextTs` (parser e regras de TypeScript), sonar e os orcamentos de
+// complexidade continuam valendo para o repositorio inteiro — e2e/ e as configs
+// da raiz incluidos.
+const WEB = ["apps/web/**/*.{js,jsx,mjs,ts,tsx,mts,cts}"];
+
 const eslintConfig = defineConfig([
-  ...nextVitals,
+  {
+    files: WEB,
+    // `@next/next/no-html-link-for-pages` procura `app/`/`pages/` a partir do cwd
+    // (a raiz). Sem `rootDir` ele olharia o lugar errado e calaria em silencio.
+    settings: { next: { rootDir: "apps/web" } },
+    extends: [nextVitals],
+  },
   ...nextTs,
   sonarjs.configs.recommended,
   {
@@ -25,6 +37,7 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    files: WEB,
     // Frontend correctness — extends eslint-config-next (which already enables
     // react, react-hooks, jsx-a11y, @next/next). See docs/standards/frontend.md.
     rules: {
@@ -39,22 +52,25 @@ const eslintConfig = defineConfig([
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
-    // Test/tooling output.
-    "coverage/**",
+    // Default ignores of eslint-config-next. Ancorados em `apps/*` (nao `**`): o
+    // build do Next sai em apps/web/.next, e um diretorio de codigo chamado
+    // `build/` ou `out/` dentro de um app nao pode sumir do lint em silencio.
+    "apps/*/.next/**",
+    "apps/*/out/**",
+    "apps/*/build/**",
+    "apps/*/next-env.d.ts",
+    // Test/tooling output. O relatorio do Playwright sai na raiz; a cobertura,
+    // no app que rodou o Vitest.
+    "apps/*/coverage/**",
     "playwright-report/**",
     "test-results/**",
     // Prisma-generated client.
-    "src/generated/**",
+    "apps/*/src/generated/**",
     // Vendored shadcn/ui registry code — Prettier-formatted and type-checked,
     // but exempt from our opinionated lint (we don't hand-maintain it to our
     // standards; a shadcn update would clobber edits).
-    "src/components/ui/**",
-    "src/hooks/**",
+    "apps/web/src/components/ui/**",
+    "apps/web/src/hooks/**",
     // Raias do Relay (worktrees de issue) vivem dentro do checkout; sem isto o
     // `pnpm check` da main varreria o codigo de outra raia.
     ".claude/worktrees/**",

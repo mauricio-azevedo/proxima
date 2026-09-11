@@ -2,23 +2,28 @@
 
 Projeto Claude Design: **Próxima Design System** (`d2ddd51b-5628-43ad-9fe8-a42bd3043735`).
 
-## Gotchas deste repo (app único, não monorepo)
+## Gotchas deste repo
 
-O conversor espera `node_modules/<pkg>` (natural em monorepo). O Próxima é um
-**app único** → esse link não existe. Solução (NÃO apontar o symlink pra raiz — isso
-faz loop infinito de `node_modules`):
+> **Desatualizado desde #34**: o Próxima virou monorepo pnpm e o app é o pacote
+> `@proxima/web` em `apps/web/`, então `node_modules/@proxima/web` passa a existir de
+> verdade e o truque do symlink abaixo provavelmente é desnecessário. Os caminhos foram
+> corrigidos, mas **o procedimento não foi re-testado** nesta estrutura.
+
+O conversor espera `node_modules/<pkg>`. Antes do monorepo esse link não existia e era
+preciso forjá-lo (NÃO apontar o symlink pra raiz — isso faz loop infinito de
+`node_modules`):
 
 ```sh
 mkdir -p .design-sync/pkg
-cp package.json .design-sync/pkg/package.json
-ln -s "$PWD/src" .design-sync/pkg/src
-ln -s "$PWD/tsconfig.json" .design-sync/pkg/tsconfig.json
+cp apps/web/package.json .design-sync/pkg/package.json
+ln -s "$PWD/apps/web/src" .design-sync/pkg/src
+ln -s "$PWD/apps/web/tsconfig.json" .design-sync/pkg/tsconfig.json
 ln -sfn "$PWD/.design-sync/pkg" node_modules/proxima   # pkg-dir limpo, sem node_modules interno
 ```
 
 - **CSS**: Tailwind v4 é JIT — não há stylesheet compilado. Gerar antes de cada build:
-  `pnpm dlx @tailwindcss/cli@4 -i src/app/globals.css -o .design-sync/pkg/compiled.css`
-  (rodar da raiz p/ o content-scan pegar `src/`). `cfg.cssEntry = "compiled.css"`.
+  `pnpm dlx @tailwindcss/cli@4 -i apps/web/src/app/globals.css -o .design-sync/pkg/compiled.css`
+  (rodar da raiz p/ o content-scan pegar `apps/web/src/`). `cfg.cssEntry = "compiled.css"`.
 - **Render check**: precisa de `playwright` importável. Instalado isolado:
   `(cd .ds-sync && npm i playwright@1.61.1)` — casa com o chromium-1228 do e2e.
 - **Build**: `node .ds-sync/package-build.mjs --config .design-sync/config.json --node-modules ./node_modules --out ./ds-bundle` (synth-entry: 60 arquivos → **329 componentes**).

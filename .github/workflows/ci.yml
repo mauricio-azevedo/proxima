@@ -76,8 +76,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Apply migrations to the throwaway CI database.
-      - run: pnpm exec prisma migrate deploy
+      # Apply migrations to the throwaway CI database. O script da raiz delega ao
+      # workspace dono do Prisma (@proxima/web), onde o schema vive.
+      - run: pnpm run db:deploy
 
       - run: pnpm exec playwright install --with-deps chromium
 

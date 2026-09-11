@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.*
 .yarn/*
@@ -11,18 +11,18 @@
 !.yarn/versions
 
 # testing
-/coverage
+apps/*/coverage/
 /playwright-report
 /test-results
 /blob-report
 /playwright/.cache
 
 # next.js
-/.next/
-/out/
+apps/*/.next/
+apps/*/out/
 
 # production
-/build
+apps/*/build/
 
 # misc
 .DS_Store
@@ -51,7 +51,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-/src/generated/prisma
+apps/*/src/generated/
 
 # design-sync (converter scripts, build output, cache — durable set under .design-sync/ IS committed)
 /.ds-sync/
