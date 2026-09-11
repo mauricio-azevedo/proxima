@@ -42,20 +42,17 @@ PostgreSQL + Prisma 7 (driver adapter) · Vitest + Playwright · pnpm. Porquês 
 
 ## Estrutura
 
-Workspace pnpm: cada app em `apps/`. Todo comando roda **da raiz**, que só orquestra (`--filter`/`pnpm -r`) e é dona do ESLint, Prettier, husky, lint-staged, commitlint, Playwright e `bin/raia`.
+Workspace pnpm: cada app em `apps/`. Todo comando roda **da raiz**, que só orquestra (`--filter`/`pnpm -r`) e é dona do ESLint, Prettier, husky, lint-staged, commitlint, Playwright, `bin/raia` e do `tsconfig.base.json` (só o rigor de TS; cada projeto estende). `e2e/` e `docs/` ficam nela.
 
 ```
 apps/web/      @proxima/web — o app Next inteiro; .env por app (template .env.example).
   src/app/         Rotas, layouts e páginas (App Router). Server Components por padrão.
   src/lib/         Utilitários compartilhados: db.ts (Prisma), utils.ts (cn).
   src/components/  ui/ = primitivos shadcn/ui (VENDIDO do registro, isento do lint).
-  src/hooks/       Hooks do shadcn (vendido).
-  src/generated/   Client Prisma — GERADO, gitignored, não editar.
+  src/hooks/       Hooks do shadcn (vendido). src/generated/: client Prisma, não editar.
   src/env.ts       Env validadas (Zod). Importe daqui, nunca process.env direto.
   prisma/          schema.prisma + migrations/ (aqui até a api existir — ADR-0004).
-e2e/           Testes Playwright, da raiz: exercitam o app de fora.
-docs/          adr/ (decisões), domain/ (regras de negócio), product/ (conceitos de feature).
-bin/raia       Isolamento de runtime por raia. tsconfig.base.json: só o rigor de TS.
+  CLAUDE.md        Só segura o bloco que o `next dev` injeta — ver Armadilhas.
 ```
 
 ## Convenções
@@ -110,17 +107,16 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
   `.prettierignore` (#30).
 - **e2e falha com "Executable doesn't exist" após bump do `@playwright/test`** — rode
   `pnpm exec playwright install chromium` (#27).
-- **`next dev` reescreve o `AGENTS.md` sozinho** — desde o Next 16.3, ele detecta o agente
-  (env `CLAUDECODE` e afins) e injeta um bloco `nextjs-agent-rules`; não há opt-out. O bloco
-  mora no `CLAUDE.md` de propósito: com ele lá, o Next não toca no `AGENTS.md`. Não mova nem
-  apague; se o Next mudar o texto, commite o diff no `CLAUDE.md` (#40).
-- **`pnpm dev` morre na validação do `src/env.ts`** — o `.env` virou por app: quem tinha um
-  na raiz precisa de `mv .env apps/web/.env` uma vez; o da raiz não é lido (#38).
-- **Escopar `eslint-config-next/typescript` para `apps/web/**` deixa `e2e/` sem lint nenhum**
-  — é ele que torna `.ts` lintável; só o `core-web-vitals` é escopado. Sintoma: um
+- **`next dev` cria um `apps/web/AGENTS.md` sozinho** — desde o 16.3 ele detecta o agente (env
+  `CLAUDECODE` e afins) e injeta um bloco `nextjs-agent-rules` onde roda; sem opt-out. Só para
+  se achar um `CLAUDE.md` com o bloco ali — daí o `apps/web/CLAUDE.md`. Não mexa (#40, #38).
+- **`pnpm dev` morre na validação do `src/env.ts`** — o `.env` virou por app: quem tinha um na
+  raiz precisa de `mv .env apps/web/.env` uma vez; o da raiz não é lido (#38).
+- **Escopar `eslint-config-next/typescript` para `apps/web/**` deixa `e2e/` sem lint nenhum** —
+  é ele que torna `.ts` lintável; só o `core-web-vitals` é escopado. Sintoma: um
   `eslint --print-config <arquivo>` que devolve `undefined` (#38).
-- **`eslint-config-next` (raiz) e `next` (apps/web) podem divergir** — o Dependabot os abre
-  em PRs separados; mantenha casados. Idem `typescript`, declarado nos dois (#38).
+- **`eslint-config-next` (raiz) e `next` (apps/web) podem divergir** — o Dependabot os abre em
+  PRs separados; mantenha casados. Idem `typescript`, declarado nos dois (#38).
 
 ## Git & PRs
 
