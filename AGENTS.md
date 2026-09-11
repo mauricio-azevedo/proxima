@@ -100,7 +100,7 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
   não lê `.node-version`, e `source ~/.nvm/nvm.sh` sozinho sai com 3 (alias `default` aponta
   para versão não instalada), o que mata uma cadeia `&&`. Use `bin/raia` ou
   `source ~/.nvm/nvm.sh --no-use && nvm use`; o `.nvmrc` existe por isso (#30). Quem não
-  puder embrulhar o `git` no `bin/raia` carrega o nvm em `~/.config/husky/init.sh` (#37).
+  puder embrulhar o `git` no `bin/raia` carrega o nvm em `~/.config/husky/init.sh` (#38).
 - **Raias vivem em `.claude/worktrees/` dentro do checkout** — ignoradas por git, prettier e
   eslint; não remova essas linhas (#30).
 - **Playwright reusa servidor existente** — fora do `bin/raia`, o e2e de uma raia bateria no
@@ -115,12 +115,12 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
   mora no `CLAUDE.md` de propósito: com ele lá, o Next não toca no `AGENTS.md`. Não mova nem
   apague; se o Next mudar o texto, commite o diff no `CLAUDE.md` (#40).
 - **`pnpm dev` morre na validação do `src/env.ts`** — o `.env` virou por app: quem tinha um
-  na raiz precisa de `mv .env apps/web/.env` uma vez; o da raiz não é lido (#37).
+  na raiz precisa de `mv .env apps/web/.env` uma vez; o da raiz não é lido (#38).
 - **Escopar `eslint-config-next/typescript` para `apps/web/**` deixa `e2e/` sem lint nenhum**
   — é ele que torna `.ts` lintável; só o `core-web-vitals` é escopado. Sintoma: um
-  `eslint --print-config <arquivo>` que devolve `undefined` (#37).
+  `eslint --print-config <arquivo>` que devolve `undefined` (#38).
 - **`eslint-config-next` (raiz) e `next` (apps/web) podem divergir** — o Dependabot os abre
-  em PRs separados; mantenha casados. Idem `typescript`, declarado nos dois (#37).
+  em PRs separados; mantenha casados. Idem `typescript`, declarado nos dois (#38).
 
 ## Git & PRs
 
