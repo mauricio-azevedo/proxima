@@ -52,14 +52,16 @@ const eslintConfig = defineConfig([
   prettier,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next. Agora em qualquer nivel: o build do
-    // Next sai em apps/web/.next e a cobertura do Vitest em apps/web/coverage.
-    "**/.next/**",
-    "**/out/**",
-    "**/build/**",
-    "**/next-env.d.ts",
-    // Test/tooling output.
-    "**/coverage/**",
+    // Default ignores of eslint-config-next. Ancorados em `apps/*` (nao `**`): o
+    // build do Next sai em apps/web/.next, e um diretorio de codigo chamado
+    // `build/` ou `out/` dentro de um app nao pode sumir do lint em silencio.
+    "apps/*/.next/**",
+    "apps/*/out/**",
+    "apps/*/build/**",
+    "apps/*/next-env.d.ts",
+    // Test/tooling output. O relatorio do Playwright sai na raiz; a cobertura,
+    // no app que rodou o Vitest.
+    "apps/*/coverage/**",
     "playwright-report/**",
     "test-results/**",
     // Prisma-generated client.
