@@ -105,6 +105,10 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
   `.prettierignore` (#30).
 - **e2e falha com "Executable doesn't exist" após bump do `@playwright/test`** — rode
   `pnpm exec playwright install chromium` (#27).
+- **`next dev` reescreve o `AGENTS.md` sozinho** — desde o Next 16.3, ele detecta o agente
+  (env `CLAUDECODE` e afins) e injeta um bloco `nextjs-agent-rules`; não há opt-out. O bloco
+  mora no `CLAUDE.md` de propósito: com ele lá, o Next não toca no `AGENTS.md`. Não mova nem
+  apague; se o Next mudar o texto, commite o diff no `CLAUDE.md` (#40).
 
 ## Git & PRs
 
