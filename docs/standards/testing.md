@@ -36,7 +36,7 @@ rede/disco/sleep; **medium** = pode localhost (ex.: Postgres de teste); **large*
 
 ## Onde ficam
 
-- Unit/componente (Vitest, jsdom): `*.test.ts(x)` ao lado do código, em `src/`.
+- Unit/componente (Vitest, jsdom): `*.test.ts(x)` ao lado do código, em `apps/*/src/`.
 - E2E (Playwright): em `e2e/`.
 
 ## Fontes
