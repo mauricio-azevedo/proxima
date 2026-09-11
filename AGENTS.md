@@ -12,7 +12,7 @@ Trabalho não trivial nasce de issue: `/plano <n>` escreve o plano na issue → 
 ## Regras locais
 
 - Conventional Commits obrigatório; o hook `commit-msg` rejeita o resto.
-- Não edite `src/generated/**` (gerado) nem migrations já aplicadas (gere outra).
+- Não edite `apps/*/src/generated/**` (gerado) nem migrations já aplicadas (gere outra).
 - Decisão arquitetural vira ADR em `docs/adr/`, com "O que mudaria" (template `0000`).
 
 ## Ambiente e comandos
@@ -20,7 +20,8 @@ Trabalho não trivial nasce de issue: `/plano <n>` escreve o plano na issue → 
 ```bash
 source ~/.nvm/nvm.sh --no-use && nvm use   # node/pnpm nao existem em shell nao interativo; nvm le o .nvmrc
 docker compose up -d                       # Postgres 18 em 5434 (container proxima-db)
-pnpm install                               # postinstall gera o client Prisma
+cp apps/web/.env.example apps/web/.env     # o .env e por app, nao da raiz
+pnpm install                               # postinstall do @proxima/web gera o client Prisma
 pnpm dev                                   # http://localhost:3100
 pnpm check                                 # O GATE: lint, typecheck, format, unit. Build e e2e rodam no CI em jobs proprios
 pnpm test:e2e                              # Playwright; sobe build + start em 3100 (reusa servidor de pe)
@@ -41,18 +42,20 @@ PostgreSQL + Prisma 7 (driver adapter) · Vitest + Playwright · pnpm. Porquês 
 
 ## Estrutura
 
+Workspace pnpm: cada app em `apps/`. Todo comando roda **da raiz**, que só orquestra (`--filter`/`pnpm -r`) e é dona do ESLint, Prettier, husky, lint-staged, commitlint, Playwright e `bin/raia`.
+
 ```
-src/
-  app/         Rotas, layouts e páginas (App Router). Server Components por padrão.
-  lib/         Utilitários compartilhados: db.ts (Prisma), utils.ts (cn).
-  components/  ui/ = primitivos shadcn/ui (VENDIDO do registro, isento do lint).
-  hooks/       Hooks do shadcn (vendido).
-  generated/   Client Prisma — GERADO, gitignored, não editar.
-  env.ts       Variáveis de ambiente validadas (Zod). Importe daqui, nunca process.env direto.
-e2e/           Testes Playwright.
-prisma/        schema.prisma + migrations/.
+apps/web/      @proxima/web — o app Next inteiro; .env por app (template .env.example).
+  src/app/         Rotas, layouts e páginas (App Router). Server Components por padrão.
+  src/lib/         Utilitários compartilhados: db.ts (Prisma), utils.ts (cn).
+  src/components/  ui/ = primitivos shadcn/ui (VENDIDO do registro, isento do lint).
+  src/hooks/       Hooks do shadcn (vendido).
+  src/generated/   Client Prisma — GERADO, gitignored, não editar.
+  src/env.ts       Env validadas (Zod). Importe daqui, nunca process.env direto.
+  prisma/          schema.prisma + migrations/ (aqui até a api existir — ADR-0004).
+e2e/           Testes Playwright, da raiz: exercitam o app de fora.
 docs/          adr/ (decisões), domain/ (regras de negócio), product/ (conceitos de feature).
-bin/raia       Isolamento de runtime por raia.
+bin/raia       Isolamento de runtime por raia. tsconfig.base.json: só o rigor de TS.
 ```
 
 ## Convenções
@@ -64,7 +67,8 @@ bin/raia       Isolamento de runtime por raia.
 - **UI**: alvo WCAG 2.2 AA; tokens semânticos, nunca valor cru; toda view de dados cobre
   loading/empty/error.
 - **Componentes**: primitivos de `@/components/ui` (shadcn/ui, [ADR-0003](docs/adr/0003-ui-library-shadcn.md));
-  adicione com `pnpm dlx shadcn@latest add <nome>`. Não os edite à mão sem motivo.
+  adicione com `pnpm dlx shadcn@latest add <nome>` **rodado de `apps/web`**. Não os edite à
+  mão sem motivo.
 - **TypeScript**: sem `any`; `strict` no máximo (inclui `noUncheckedIndexedAccess`).
 
 ## Padrões
@@ -74,14 +78,14 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
 
 ## Banco de dados
 
-- Modelagem em `prisma/schema.prisma`; depois `pnpm db:migrate`.
+- Modelagem em `apps/web/prisma/schema.prisma`; depois `pnpm db:migrate` (da raiz).
 - Acesso ao banco **só** pelo singleton `db` de `@/lib/db`.
 - Prisma 7: a URL vem de `prisma.config.ts` (CLI) e do adapter em runtime; o schema **não**
   tem `url`. Não reintroduza.
 
 ## Testes
 
-- **Unitário/componente** (Vitest, jsdom): `*.test.ts(x)` ao lado do código, em `src/`.
+- **Unitário/componente** (Vitest, jsdom): `*.test.ts(x)` ao lado do código, em `apps/*/src/`.
 - **E2E** (Playwright): em `e2e/`, fluxos de usuário de verdade.
 - Toda regra de negócio de `docs/domain/pelada.md` merece teste.
 - Critério de aceite do plano vira nome de teste; o commit que faz passar não altera o teste.
@@ -95,7 +99,8 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
 - **"command not found: pnpm" em shell não interativo** — o nvm carrega tarde no `.bashrc`,
   não lê `.node-version`, e `source ~/.nvm/nvm.sh` sozinho sai com 3 (alias `default` aponta
   para versão não instalada), o que mata uma cadeia `&&`. Use `bin/raia` ou
-  `source ~/.nvm/nvm.sh --no-use && nvm use`; o `.nvmrc` existe por isso (#30).
+  `source ~/.nvm/nvm.sh --no-use && nvm use`; o `.nvmrc` existe por isso (#30). Quem não
+  puder embrulhar o `git` no `bin/raia` carrega o nvm em `~/.config/husky/init.sh` (#37).
 - **Raias vivem em `.claude/worktrees/` dentro do checkout** — ignoradas por git, prettier e
   eslint; não remova essas linhas (#30).
 - **Playwright reusa servidor existente** — fora do `bin/raia`, o e2e de uma raia bateria no
@@ -109,6 +114,13 @@ revisor cego cobra o resto. Os textos em `docs/standards/` são referência, em 
   (env `CLAUDECODE` e afins) e injeta um bloco `nextjs-agent-rules`; não há opt-out. O bloco
   mora no `CLAUDE.md` de propósito: com ele lá, o Next não toca no `AGENTS.md`. Não mova nem
   apague; se o Next mudar o texto, commite o diff no `CLAUDE.md` (#40).
+- **`pnpm dev` morre na validação do `src/env.ts`** — o `.env` virou por app: quem tinha um
+  na raiz precisa de `mv .env apps/web/.env` uma vez; o da raiz não é lido (#37).
+- **Escopar `eslint-config-next/typescript` para `apps/web/**` deixa `e2e/` sem lint nenhum**
+  — é ele que torna `.ts` lintável; só o `core-web-vitals` é escopado. Sintoma: um
+  `eslint --print-config <arquivo>` que devolve `undefined` (#37).
+- **`eslint-config-next` (raiz) e `next` (apps/web) podem divergir** — o Dependabot os abre
+  em PRs separados; mantenha casados. Idem `typescript`, declarado nos dois (#37).
 
 ## Git & PRs
 

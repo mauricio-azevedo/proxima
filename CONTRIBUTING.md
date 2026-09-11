@@ -37,10 +37,14 @@ pnpm test:watch                            # testes em watch enquanto desenvolve
 Numa raia (worktree de uma issue), todo comando passa por `bin/raia <n> -- <comando>`, que
 sobe o banco, cria um database próprio e exporta `PORT` e `DATABASE_URL`.
 
+O repositório é um monorepo pnpm: as aplicações vivem em `apps/` (hoje só `apps/web`) e os
+comandos acima rodam da raiz, que delega ao projeto dono. O `.env` é por app —
+`apps/web/.env`, não na raiz.
+
 ## Banco de dados & migrations
 
-- Edite `prisma/schema.prisma` e rode `pnpm db:migrate` para criar/aplicar a
-  migration e regenerar o client.
+- Edite `apps/web/prisma/schema.prisma` e rode `pnpm db:migrate` (da raiz) para criar/aplicar
+  a migration e regenerar o client. O Prisma mora no web até a api existir ([ADR-0004](docs/adr/0004-backend-separado-nestjs.md)).
 - **Migrations são imutáveis** depois de commitadas. Para corrigir, gere uma nova.
 - Precisa recomeçar do zero? `pnpm db:reset` (apaga e reaplica tudo).
 
